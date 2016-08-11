@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="calendar_item_event_view_image_margin_vertical">2dp</dimen>
+    <dimen name="calendar_item_event_view_image_size">21dp</dimen>
+    <dimen name="calendar_item_bid_view_image_size">16dp</dimen>
+    <dimen name="calendar_item_shift_indicator_width">23dp</dimen>
+    <dimen name="calendar_item_shift_indicator_height">4dp</dimen>
+    <dimen name="calendar_item_date_title_padding_side">10dp</dimen>
+    <dimen name="calendar_item_date_title_padding_top_bottom">2dp</dimen>
+</resources>

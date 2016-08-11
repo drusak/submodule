@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="month_grid_item_month_day_text_color">#000000</color>
+    <color name="month_grid_item_footer_background_color">#8c92ff</color>
+
+    <color name="month_grid_date_title_text_color">#3366ff</color>
+    <color name="month_grid_item_day_background_color">#ffffff</color>
+    <color name="month_grid_item_weekend_day_background_color">#ebebeb</color>
+
+</resources>

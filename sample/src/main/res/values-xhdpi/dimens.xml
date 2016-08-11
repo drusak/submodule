@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="month_grid_item_shift_indicator_height">4dp</dimen>
+    <dimen name="month_grid_item_shift_indicator_margin_side">3dp</dimen>
+    <dimen name="calendar_item_view_margin_bottom">2dp</dimen>
+</resources>

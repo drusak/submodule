@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="calendar_item_event_view_footer_color">#cfecff</color>
+    <color name="calendar_item_date_title_text_color">#3366ff</color>
+    <color name="month_grid_date_title_text_color">#3366ff</color>
+    <color name="month_grid_item_day_background_color">#ffffff</color>
+    <color name="month_grid_item_weekend_day_background_color">#ebebeb</color>
+</resources>

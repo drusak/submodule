@@ -167,7 +167,8 @@ public class MonthGridAdapter extends BaseAdapter {
                     mBidView.setVisibility(View.INVISIBLE);
                     mActionBidView.setVisibility(View.INVISIBLE);
 
-                    mRootView.setBackgroundColor(Color.LTGRAY);
+                    // TODO: Reimplement
+                    mRootView.setBackgroundColor(Color.parseColor("#ebebeb"));
 
                     // TODO: Consider adding click listeners for this specific view
                     // Remove click listeners

@@ -1,11 +1,13 @@
 package com.verint.library.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.verint.actionablecalendar.calendar.CalendarBuilder;
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
@@ -14,6 +16,8 @@ import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.CalendarWidget;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
 import com.verint.library.R;
+import com.verint.library.listeners.OnLoadMoreListener;
+import com.verint.library.listeners.OnMonthListScrollListener;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,48 +28,104 @@ import java.util.List;
  *
  * Created by acheshihin on 8/10/2016.
  */
-public class MonthListAdapter extends RecyclerView.Adapter<MonthListAdapter.MonthListItemViewHolder> {
+public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnMonthListScrollListener {
 
     private static final String TAG = MonthListAdapter.class.getSimpleName();
 
-    private List<Date> mData;
+    public static final int VISIBLE_THRESHOLD = 3;
+
+    private static final int VIEW_TYPE_ITEM = 0;
+    private static final int VIEW_TYPE_LOADING = 1;
+
+    private OnLoadMoreListener mOnLoadMoreListener;
     private CalendarCallbacks mListener;
+    private boolean mLoadingInProgress;
+    private int mLastVisibleItem;
+    private int mTotalItemCount;
+
+    private List<Date> mData;
+
 
     public MonthListAdapter(@NonNull List<Date> data, @NonNull CalendarCallbacks listener){
+
         mData = data;
         mListener = listener;
     }
 
-
-    @Override
-    public MonthListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        return new MonthListItemViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.month_list_item, parent, false));
+    /**
+     * Assigns listener for load more event
+     *
+     * @param listener {@link OnLoadMoreListener}
+     */
+    public void setOnLoadMoreListener(@NonNull OnLoadMoreListener listener){
+        mOnLoadMoreListener = listener;
     }
 
     @Override
-    public void onBindViewHolder(MonthListItemViewHolder holder, int position) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        // TODO: Consider rolling back to commented implementation in case test will fail
+        switch (viewType){
+            case VIEW_TYPE_ITEM:
+                return new MonthViewHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.month_list_item, parent, false));
 
-        Date date = getListItem(position);
+            case VIEW_TYPE_LOADING:
+                return new LoadingViewHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.month_list_item_loading, parent, false));
 
-        CalendarDataFactory factory = CalendarDataFactory.newInstance();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        MixedVisibleMonth month = factory.create(date);
+            default:
+                throw new IllegalStateException("Unknown view type found");
+        }
+    }
 
-        holder.mCalendarWidget.set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        Log.i(TAG, "Position: " + position + ", for: " + CalendarUtils.getHumanFriendlyCalendarRepresentation(CalendarUtils.getCalendarFrom(date)));
-        Log.i(TAG, "Month: " + month.toString());
+        if (holder instanceof MonthViewHolder){
 
+            // Build days object for representation
+            MixedVisibleMonth month = CalendarDataFactory.newInstance()
+                    .create(CalendarUtils.getCalendarFrom(getListItem(position)).getTime());
+            // Bind data to adapter
+            ((MonthViewHolder) holder).mCalendarWidget
+                    .set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));
 
-        // Build days object for representation
-        // MixedVisibleMonth month = new CalendarDataFactory().create(CalendarUtils.getCalendarFrom(getListItem(position)).getTime());
-        // Bind data to adapter
-        // holder.mCalendarWidget.set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));
+        } else if (holder instanceof LoadingViewHolder){
+
+            ((LoadingViewHolder) holder).mProgressBar.setIndeterminate(true);
+
+        } else {
+
+            throw new IllegalStateException("View holder is null or belongs to improper type");
+        }
+    }
+
+    /**
+     * Adds {@link Date} item to data list at last position and notifies adapter that data
+     * was changed
+     *
+     * @param date {@link Date}|null
+     */
+    public void addItem(Date date){
+
+        if (mData == null){
+            throw new IllegalStateException("Data list was not initialized");
+        }
+
+        mData.add(date);
+        notifyItemInserted(mData.size()-1);
+    }
+
+    /**
+     * Removes {@link Date} item from data list at the desired position and notifies adapter regarding
+     * the data change
+     *
+     * @param position
+     */
+    public void removeItem(final int position){
+
+        mData.remove(position);
+        notifyItemRemoved(position);
     }
 
     private Date getListItem(final int position){
@@ -78,18 +138,60 @@ public class MonthListAdapter extends RecyclerView.Adapter<MonthListAdapter.Mont
 
     @Override
     public int getItemCount() {
-        if (mData == null){
-            throw new IllegalStateException("Data was not initialized");
-        }
-
-        return mData.size();
+        return mData != null ? mData.size() : 0;
     }
 
-    public static class MonthListItemViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemViewType(int position) {
+        return mData.get(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
+    }
 
-        CalendarWidget mCalendarWidget;
+    // {@link OnLoadMoreListener} region begin
 
-        public MonthListItemViewHolder(View itemView) {
+    /**
+     * Changes loading in progress state value to false (Loading completed)
+     */
+    public void setLoaded(){
+        mLoadingInProgress = false;
+    }
+
+    // {@link OnLoadMoreListener} region end
+
+    // {@link OnMonthListScrollListener} region begin
+
+    @Override
+    public void onMonthListScroll(@NonNull LinearLayoutManager linearLayoutManager) {
+
+        mTotalItemCount = linearLayoutManager.getItemCount();
+        mLastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
+        if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
+            if (mOnLoadMoreListener != null){
+                mOnLoadMoreListener.onLoadMore();
+            }
+            mLoadingInProgress = true;
+        }
+    }
+
+    // {@link OnMonthListScrollListener} region end
+
+    // --------------------------------------------------------------------------------------------
+    public static class LoadingViewHolder extends RecyclerView.ViewHolder {
+
+        public ProgressBar mProgressBar;
+
+        public LoadingViewHolder(View itemView) {
+            super(itemView);
+            mProgressBar = (ProgressBar) itemView.findViewById(R.id.pbMonthListItemLoadingProgressBar);
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------
+    public static class MonthViewHolder extends RecyclerView.ViewHolder {
+
+        public CalendarWidget mCalendarWidget;
+
+        public MonthViewHolder(View itemView) {
             super(itemView);
             mCalendarWidget = (CalendarWidget) itemView.findViewById(R.id.cwMonthListItem);
         }

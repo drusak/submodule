@@ -13,18 +13,18 @@ import com.verint.mylibrary.R;
 /**
  * Created by acheshihin on 8/11/2016.
  */
-public class ActionBidView extends FrameLayout {
+public class AuctionBidView extends FrameLayout {
 
     private View mRootView;
     private ImageView mEventImage;
     private ImageView mEventBadge;
 
-    public ActionBidView(Context context) {
+    public AuctionBidView(Context context) {
         super(context);
         init(context, null);
     }
 
-    public ActionBidView(Context context, AttributeSet attrs) {
+    public AuctionBidView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
@@ -42,12 +42,12 @@ public class ActionBidView extends FrameLayout {
 
         if (attrs != null){
 
-            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ActionBidView, 0, 0);
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AuctionBidView, 0, 0);
 
             try{
-                showBadge = typedArray.getBoolean(R.styleable.ActionBidView_showBadge, false);
-                imageDrawable = typedArray.getDrawable(R.styleable.ActionBidView_imageSrc);
-                badgeDrawable = typedArray.getDrawable(R.styleable.ActionBidView_badgeSrc);
+                showBadge = typedArray.getBoolean(R.styleable.AuctionBidView_showBadge, false);
+                imageDrawable = typedArray.getDrawable(R.styleable.AuctionBidView_imageSrc);
+                badgeDrawable = typedArray.getDrawable(R.styleable.AuctionBidView_badgeSrc);
 
             } finally {
                 typedArray.recycle();

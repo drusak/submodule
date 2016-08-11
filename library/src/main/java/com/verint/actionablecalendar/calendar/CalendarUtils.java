@@ -146,6 +146,29 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date getNextMonth(@NonNull final Date dayDate){
+
+        Calendar calendar = (Calendar) CALENDAR.clone();
+        calendar.setTime(dayDate);
+        // 1-based
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Change calendar by adding one month
+        calendar.add(Calendar.MONTH,1);
+        return calendar.getTime();
+    }
+
+    public static Date getPreviousMonth(@NonNull final Date dayDate){
+
+        Calendar calendar = (Calendar) CALENDAR.clone();
+        calendar.setTime(dayDate);
+        // 1-based
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        // Change calendar by removing one month
+        calendar.add(Calendar.MONTH,-1);
+        return calendar.getTime();
+    }
+
     public static Calendar getCalendarFrom(@NonNull final Date date){
 
         Calendar calendar = (Calendar) CALENDAR.clone();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="ActionBidView">
+    <declare-styleable name="AuctionBidView">
         <attr name="showBadge" format="boolean"/>
         <attr name="imageSrc" format="integer"/>
         <attr name="badgeSrc" format="integer"/>

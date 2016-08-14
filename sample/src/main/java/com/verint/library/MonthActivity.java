@@ -12,6 +12,7 @@ import com.verint.actionablecalendar.calendar.CalendarCallbacks;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.Day;
 import com.verint.actionablecalendar.calendar.models.AuctionBid;
+import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.actionablecalendar.calendar.models.Shift;
 import com.verint.actionablecalendar.weekday.WeekDayBuilder;
 import com.verint.actionablecalendar.weekday.WeekDayDataFactory;
@@ -135,11 +136,25 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
     // {@link CalendarCallbacks} region end
 
     // {@link OnLoadMoreListener} region begin
-    @Override
-    public void onLoadMore() {
 
-        // Add null item in order to enable loading progress bar at the bottom
-        mAdapter.addItem(null);
+    @Override
+    public void onLoadMore(Direction scrollDirection) {
+
+        switch (scrollDirection){
+
+            case UP: // Past dates
+                //  TODO: Not implemented
+                mAdapter.addItemAtBeginning(null);
+                break;
+
+            case DOWN:// Future dates
+                // Add null item in order to enable loading progress bar at the bottom
+                mAdapter.addItem(null);
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown case found");
+        }
 
         // Load more data with simulated long running processing
         new Handler().postDelayed(new Runnable() {

@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:weightSum="7"
+    android:background="@color/month_grid_item_weekend_day_background_color"
     android:orientation="horizontal">
 
     <TextView

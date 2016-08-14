@@ -3,7 +3,6 @@ package com.verint.library.adapters;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +14,11 @@ import com.verint.actionablecalendar.calendar.CalendarDataFactory;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.CalendarWidget;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
+import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.library.R;
 import com.verint.library.listeners.OnLoadMoreListener;
 import com.verint.library.listeners.OnMonthListScrollListener;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +27,8 @@ import java.util.List;
  *
  * Created by acheshihin on 8/10/2016.
  */
-public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnMonthListScrollListener {
+public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements OnMonthListScrollListener {
 
     private static final String TAG = MonthListAdapter.class.getSimpleName();
 
@@ -116,6 +116,11 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemInserted(mData.size()-1);
     }
 
+    public void addItemAtBeginning(Date date){
+
+        // TODO: Implement
+    }
+
     /**
      * Removes {@link Date} item from data list at the desired position and notifies adapter regarding
      * the data change
@@ -167,7 +172,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
             if (mOnLoadMoreListener != null){
-                mOnLoadMoreListener.onLoadMore();
+                mOnLoadMoreListener.onLoadMore(Direction.DOWN);
             }
             mLoadingInProgress = true;
         }

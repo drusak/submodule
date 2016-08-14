@@ -103,6 +103,16 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
+    @Override
+    public int getItemCount() {
+        return mData != null ? mData.size() : 0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mData.get(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
+    }
+
     /**
      * Adds {@link Date} item to data list at last position and notifies adapter that data
      * was changed
@@ -119,6 +129,12 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemInserted(mData.size()-1);
     }
 
+    /**
+     * Adds {@link Date} item to data list at position 0 and notifies adapter that item was
+     * inserted
+     *
+     * @param date {@link Date}|null
+     */
     public void addItemAtBeginning(Date date){
 
         if (mData == null){
@@ -129,6 +145,12 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemInserted(0);
     }
 
+    /**
+     * Adds {@link Date} item to data list at the position of the end of the list and notifies that
+     * item was inserted at the end of list
+     *
+     * @param date {@link Date}|null
+     */
     public void addItemAtTheEnd(Date date){
 
         if (mData == null){
@@ -141,6 +163,10 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemInserted(listCount + 1);
     }
 
+    /**
+     * Removes {@link Date} item from the data list's last position and notifies adapter that
+     * item at the end of list was removed
+     */
     public void removeLastItem(){
 
         if (mData == null){
@@ -149,10 +175,13 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         final int listCount = mData.size() - 1;
         mData.remove(listCount);
-        // TODO: Consider changing
         notifyItemRemoved(listCount);
     }
 
+    /**
+     * Removes {@link Date} item from the data list's last position and notifies adapter that
+     * item at the end of list was removed
+     */
     public void removeFirstItem(){
 
         if (mData == null){
@@ -183,15 +212,6 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return mData.get(position);
     }
 
-    @Override
-    public int getItemCount() {
-        return mData != null ? mData.size() : 0;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return mData.get(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
-    }
     // {@link OnLoadMoreListener} region begin
 
     /**
@@ -237,6 +257,8 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     // {@link OnMonthListScrollListener} region end
+
+
 
     // --------------------------------------------------------------------------------------------
     public static class LoadingViewHolder extends RecyclerView.ViewHolder {

@@ -211,7 +211,7 @@ public class MonthActivity extends AppCompatActivity
                 // Inform regarding data set change and finish of loading process
                 mAdapter.setLoaded();
             }
-        }, 1_000L);
+        }, 1_500L);
     }
 
     // {@link OnLoadMoreListener} region end

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
@@ -26,11 +27,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.verint.library.adapters.MonthListAdapter.VISIBLE_THRESHOLD;
+
 /**
  * Represents list of {@link com.verint.actionablecalendar.calendar.CalendarWidget} widgets
  * according to predefined date range
  */
-public class MonthActivity extends AppCompatActivity implements CalendarCallbacks, OnLoadMoreListener {
+public class MonthActivity extends AppCompatActivity
+        implements CalendarCallbacks, OnLoadMoreListener{
 
     private List<Date> mDateList;
     private List<Shift> mShiftList;
@@ -61,9 +65,13 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
         mLayoutManager = new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false);
         mAdapter = new MonthListAdapter(mDateList, MonthActivity.this);
+        // We provide time as stable id
+        // mAdapter.setHasStableIds(true);
+
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
+
 
         mAdapter.setOnLoadMoreListener(MonthActivity.this);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -138,8 +146,9 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
     // {@link OnLoadMoreListener} region begin
 
     @Override
-    public void onLoadMore(Direction scrollDirection) {
+    public void onLoadMore(final Direction scrollDirection) {
 
+        // Insert loading item first
         switch (scrollDirection){
 
             case UP: // Past dates
@@ -156,36 +165,53 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                 throw new IllegalStateException("Unknown case found");
         }
 
+
         // Load more data with simulated long running processing
+
         new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
 
-                // Remove null item in order to disable loading progress bar at the bottom
-                mAdapter.removeItem(mDateList.size()-1);
+                switch (scrollDirection){
 
-                // Load more
-                int index = mDateList.size();
-                int end = index + MonthListAdapter.VISIBLE_THRESHOLD;
-                for (int i=index; i < end; i++){
+                    case DOWN:  // Load future dates
 
-                    Date currentLastItem = mDateList.get(i-1);
+                        // Remove loading item
+                        mAdapter.removeLastItem();
 
-                    if (currentLastItem == null){
-                        // Since last item is current null
-                        currentLastItem = mDateList.get(i-2);
-                    }
+                        // Load more
+                        int listCount = mDateList.size();
+                        int newListCount = listCount + VISIBLE_THRESHOLD;
 
-                    final Date nextMonth = CalendarUtils.getNextMonth(currentLastItem);
-                    // Add data here
-                    mDateList.add(nextMonth);
+                        for (int i=listCount; i < newListCount; i++){
+                            // Get current last item
+                            final Date lastItemDate = mDateList.get(i-1);
+                            mAdapter.addItemAtTheEnd(CalendarUtils.getNextMonth(lastItemDate));
+                        }
+                        break;
+
+                    case UP: // Load past dates
+
+                        // Remove loading item
+                        mAdapter.removeFirstItem();
+
+                        // Load more
+                        for (int i=0; i < VISIBLE_THRESHOLD; i++){
+                            // Get current first item
+                            final Date firstItemDate = mDateList.get(0);
+                            mAdapter.addItemAtBeginning(CalendarUtils.getPreviousMonth(firstItemDate));
+                        }
+                        break;
+
+                    default:
+                        throw new IllegalStateException("Unknown case found");
                 }
 
-                mAdapter.notifyDataSetChanged();
+                // Inform regarding data set change and finish of loading process
                 mAdapter.setLoaded();
             }
-        }, 1_500L);
+        }, 1_000L);
     }
 
     // {@link OnLoadMoreListener} region end

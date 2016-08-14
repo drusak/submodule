@@ -39,7 +39,10 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private OnLoadMoreListener mOnLoadMoreListener;
     private CalendarCallbacks mListener;
+
     private boolean mLoadingInProgress;
+
+    private int mFirstVisibleItem;
     private int mLastVisibleItem;
     private int mTotalItemCount;
 
@@ -118,7 +121,46 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public void addItemAtBeginning(Date date){
 
-        // TODO: Implement
+        if (mData == null){
+            throw new IllegalStateException("Data list was not initialized");
+        }
+
+        mData.add(0, date);
+        notifyItemInserted(0);
+    }
+
+    public void addItemAtTheEnd(Date date){
+
+        if (mData == null){
+            throw new IllegalStateException("Data list was not initialized");
+        }
+
+        // Count
+        final int listCount = mData.size() - 1;
+        mData.add(date);
+        notifyItemInserted(listCount + 1);
+    }
+
+    public void removeLastItem(){
+
+        if (mData == null){
+            throw new IllegalStateException("Data list was not initialized");
+        }
+
+        final int listCount = mData.size() - 1;
+        mData.remove(listCount);
+        // TODO: Consider changing
+        notifyItemRemoved(listCount);
+    }
+
+    public void removeFirstItem(){
+
+        if (mData == null){
+            throw new IllegalStateException("Data list was not initialized");
+        }
+
+        mData.remove(0);
+        notifyItemRemoved(0);
     }
 
     /**
@@ -150,7 +192,6 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public int getItemViewType(int position) {
         return mData.get(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
     }
-
     // {@link OnLoadMoreListener} region begin
 
     /**
@@ -167,15 +208,32 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onMonthListScroll(@NonNull LinearLayoutManager linearLayoutManager) {
 
-        mTotalItemCount = linearLayoutManager.getItemCount();
-        mLastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+        // Get current visible item position
+        int currentFirstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
 
-        if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
-            if (mOnLoadMoreListener != null){
-                mOnLoadMoreListener.onLoadMore(Direction.DOWN);
+        if (currentFirstVisibleItemPosition > mFirstVisibleItem){ // Load data for future
+
+            mTotalItemCount = linearLayoutManager.getItemCount();
+            mLastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
+            if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
+                if (mOnLoadMoreListener != null){
+                    mOnLoadMoreListener.onLoadMore(Direction.DOWN);
+                }
+                mLoadingInProgress = true;
             }
-            mLoadingInProgress = true;
+
+        } else { // Load data for past
+
+            if (!mLoadingInProgress && (currentFirstVisibleItemPosition - VISIBLE_THRESHOLD) <= 0){
+                if (mOnLoadMoreListener != null){
+                    mOnLoadMoreListener.onLoadMore(Direction.UP);
+                }
+                mLoadingInProgress = true;
+            }
         }
+
+        mFirstVisibleItem = currentFirstVisibleItemPosition;
     }
 
     // {@link OnMonthListScrollListener} region end

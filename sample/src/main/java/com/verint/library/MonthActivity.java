@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
@@ -19,6 +18,7 @@ import com.verint.actionablecalendar.weekday.WeekDayBuilder;
 import com.verint.actionablecalendar.weekday.WeekDayDataFactory;
 import com.verint.actionablecalendar.weekday.WeekDayWidget;
 import com.verint.library.adapters.MonthListAdapter;
+import com.verint.library.listeners.OnListScrollDirectionalListener;
 import com.verint.library.listeners.OnLoadMoreListener;
 
 import java.util.ArrayList;
@@ -60,34 +60,41 @@ public class MonthActivity extends AppCompatActivity
         mRecyclerView = (RecyclerView) findViewById(R.id.rvMainActivityMonthList);
 
         Date currentMonth = new Date(System.currentTimeMillis());
-        generateInitialMonthList(currentMonth);
+        initMonthListForDate(currentMonth);
 
         mLayoutManager = new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false);
         mAdapter = new MonthListAdapter(mDateList, MonthActivity.this);
-        // We provide time as stable id
-        // mAdapter.setHasStableIds(true);
-
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
+        // Scroll to current month between 3 initial months within list
+        mRecyclerView.scrollToPosition(1);
 
-
+        // Provide listener for load more flow
         mAdapter.setOnLoadMoreListener(MonthActivity.this);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        // Specify listener for scroll events in order to differentiate scroll direction
+        mRecyclerView.addOnScrollListener(new OnListScrollDirectionalListener(mRecyclerView) {
 
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
+            public void onScrolledUp(RecyclerView recyclerView, int dx, int dy) {
 
                 if (mAdapter != null){
-                    mAdapter.onMonthListScroll(mLayoutManager);
+                    mAdapter.onMonthListScroll(mLayoutManager, Direction.UP);
+                }
+            }
+
+            @Override
+            public void onScrolledDown(RecyclerView recyclerView, int dx, int dy) {
+
+                if (mAdapter != null){
+                    mAdapter.onMonthListScroll(mLayoutManager, Direction.DOWN);
                 }
             }
         });
     }
 
-    private void generateInitialMonthList(@NonNull Date date){
+    private void initMonthListForDate(@NonNull Date date){
 
         if (mDateList == null){
             mDateList = new ArrayList<>();
@@ -97,11 +104,7 @@ public class MonthActivity extends AppCompatActivity
             mDateList.clear();
         }
 
-        Calendar calendarStart = CalendarUtils.getCalendarFrom(date);
-        Calendar calendarEnd = (Calendar) calendarStart.clone();
-        calendarEnd.add(Calendar.MONTH, 2);
-
-        mDateList.addAll(CalendarUtils.generateMonthRange(calendarStart, calendarEnd));
+        mDateList.addAll(CalendarUtils.generateInitialMonthList(date));
     }
 
     private void initWeekDayNames(){

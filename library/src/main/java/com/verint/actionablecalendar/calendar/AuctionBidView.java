@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import com.verint.mylibrary.R;
 
 /**
+ * TODO: Add JavaDoc
+ *
  * Created by acheshihin on 8/11/2016.
  */
 public class AuctionBidView extends FrameLayout {

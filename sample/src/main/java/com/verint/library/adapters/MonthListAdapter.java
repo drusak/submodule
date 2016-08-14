@@ -225,40 +225,48 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     // {@link OnMonthListScrollListener} region begin
 
+    /**
+     * After notification regarding scroll event within list decide if additional items should
+     * be loaded and trigger loading part accordingly
+     *
+     * @param linearLayoutManager utilized {@link LinearLayoutManager}
+     * @param scrollDirection {@link Direction} gesture direction of occurred scroll event
+     */
     @Override
-    public void onMonthListScroll(@NonNull LinearLayoutManager linearLayoutManager) {
+    public void onMonthListScroll(@NonNull LinearLayoutManager linearLayoutManager,
+                                  @NonNull Direction scrollDirection) {
 
-        // Get current visible item position
-        int currentFirstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+        switch (scrollDirection){
 
-        if (currentFirstVisibleItemPosition > mFirstVisibleItem){ // Load data for future
-
-            mTotalItemCount = linearLayoutManager.getItemCount();
-            mLastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-
-            if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
-                if (mOnLoadMoreListener != null){
-                    mOnLoadMoreListener.onLoadMore(Direction.DOWN);
+            case UP:
+                mFirstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+                if (!mLoadingInProgress && (mFirstVisibleItem - VISIBLE_THRESHOLD) <= 0){
+                    if (mOnLoadMoreListener != null){
+                        mOnLoadMoreListener.onLoadMore(scrollDirection);
+                    }
+                    mLoadingInProgress = true;
                 }
-                mLoadingInProgress = true;
-            }
+                break;
 
-        } else { // Load data for past
+            case DOWN:
 
-            if (!mLoadingInProgress && (currentFirstVisibleItemPosition - VISIBLE_THRESHOLD) <= 0){
-                if (mOnLoadMoreListener != null){
-                    mOnLoadMoreListener.onLoadMore(Direction.UP);
+                mTotalItemCount = linearLayoutManager.getItemCount();
+                mLastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
+                if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
+                    if (mOnLoadMoreListener != null){
+                        mOnLoadMoreListener.onLoadMore(scrollDirection);
+                    }
+                    mLoadingInProgress = true;
                 }
-                mLoadingInProgress = true;
-            }
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown direction case found");
         }
-
-        mFirstVisibleItem = currentFirstVisibleItemPosition;
     }
 
     // {@link OnMonthListScrollListener} region end
-
-
 
     // --------------------------------------------------------------------------------------------
     public static class LoadingViewHolder extends RecyclerView.ViewHolder {

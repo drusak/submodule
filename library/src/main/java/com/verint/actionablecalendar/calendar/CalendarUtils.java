@@ -196,6 +196,15 @@ public class CalendarUtils {
         return DateUtils.isToday(day.getDate().getTime());
     }
 
+    public static List<Date> generateInitialMonthList(@NonNull Date desiredDate){
+
+        final Date previousMonth = CalendarUtils.getPreviousMonth(desiredDate);
+        final Date nextMonth = CalendarUtils.getNextMonth(desiredDate);
+
+        return generateMonthRange(CalendarUtils.getCalendarFrom(previousMonth),
+                CalendarUtils.getCalendarFrom(nextMonth));
+    }
+
     public static List<Date> generateMonthRange(final Calendar calendarStart,
                                                 final Calendar calendarEnd){
 

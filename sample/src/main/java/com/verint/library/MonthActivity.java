@@ -68,8 +68,9 @@ public class MonthActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
-        // Scroll to current month between 3 initial months within list
-        mRecyclerView.scrollToPosition(1);
+
+        // TODO: Consider implementing dedicated method to scroll to specific month
+        mRecyclerView.scrollToPosition(mAdapter.getCurrentMonthPosition());
 
         // Provide listener for load more flow
         mAdapter.setOnLoadMoreListener(MonthActivity.this);

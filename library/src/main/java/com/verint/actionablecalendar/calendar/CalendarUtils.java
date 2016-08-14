@@ -186,6 +186,18 @@ public class CalendarUtils {
     }
 
     /**
+     * Creates and returns {@link Calendar} object built according to current timestamp
+     *
+     * @return {@link Calendar}
+     */
+    public static Calendar getCalendarForToday(){
+
+        Calendar calendar = (Calendar) CALENDAR.clone();
+        calendar.setTime(new Date(System.currentTimeMillis()));
+        return calendar;
+    }
+
+    /**
      * Check if provided day is today and returns result accordingly
      *
      * @param day {@link Day}

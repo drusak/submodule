@@ -19,6 +19,7 @@ import com.verint.library.R;
 import com.verint.library.listeners.OnLoadMoreListener;
 import com.verint.library.listeners.OnMonthListScrollListener;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -111,6 +112,36 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public int getItemViewType(int position) {
         return mData.get(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
+    }
+
+    /**
+     * Returns position of item which represents current month and year
+     *
+     * @return int, position of current month or {@link RecyclerView#NO_POSITION} if not found
+     */
+    public final int getCurrentMonthPosition(){
+
+        if (mData == null){
+            throw new IllegalStateException("Data list was not initialized");
+        }
+
+        Calendar currentMonthCalendar = CalendarUtils.getCalendarForToday();
+        final int currentMonth = currentMonthCalendar.get(Calendar.MONTH);
+        final int currentYear = currentMonthCalendar.get(Calendar.YEAR);
+
+        int itemCount = getItemCount();
+        for (int i=0; i < itemCount; i++){
+            final Date currentItem = getListItem(i);
+            if (currentItem != null){ // If loader item it will be null, hence skip iteration for it
+                Calendar dateCalendar = CalendarUtils.getCalendarFrom(getListItem(i));
+                if (dateCalendar.get(Calendar.MONTH) == currentMonth
+                        && dateCalendar.get(Calendar.YEAR) == currentYear){
+                    return i;
+                }
+            }
+        }
+
+        return RecyclerView.NO_POSITION;
     }
 
     /**

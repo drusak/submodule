@@ -3,7 +3,6 @@ package com.verint.library.adapters;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,11 +38,11 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private static final int VIEW_TYPE_LOADING = 1;
 
     private OnLoadMoreListener mOnLoadMoreListener;
-    private CalendarCallbacks mListener;
+    private final CalendarCallbacks mListener;
 
     private boolean mLoadingInProgress;
 
-    private List<Date> mData;
+    private final List<Date> mData;
 
 
     public MonthListAdapter(@NonNull List<Date> data,
@@ -171,7 +170,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      *
      * @param date {@link Date}|null
      */
-    public void addItemAtBeginning(Date date){
+    public void addItemAtBeginning(final Date date){
 
         if (mData == null){
             throw new IllegalStateException("Data was not initialized");
@@ -187,7 +186,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      *
      * @param date {@link Date}|null
      */
-    public void addItemAtTheEnd(Date date){
+    public void addItemAtTheEnd(final Date date){
 
         if (mData == null){
             throw new IllegalStateException("Data was not initialized");
@@ -273,8 +272,8 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      * @param scrollDirection {@link Direction} gesture direction of occurred scroll event
      */
     @Override
-    public void onMonthListScroll(@NonNull LinearLayoutManager linearLayoutManager,
-                                  @NonNull Direction scrollDirection) {
+    public void onMonthListScroll(@NonNull final LinearLayoutManager linearLayoutManager,
+                                  @NonNull final Direction scrollDirection) {
 
         switch (scrollDirection){
 

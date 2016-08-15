@@ -44,14 +44,19 @@ public class MonthGridAdapter extends BaseAdapter {
 
     }
 
-    public void update(MixedVisibleMonth monthDate){
+
+    /**
+     * Replace existing data set used by adapter to newly provided as an argument
+     *
+     * @param monthDate {@link MixedVisibleMonth}
+     */
+    public void replace(MixedVisibleMonth monthDate){
 
         if (monthDate == null){
-            throw new IllegalArgumentException("Provided argument can't be null");
+            throw new IllegalArgumentException("Provided argument can't be  null");
         }
 
         mMonthDate = monthDate;
-        notifyDataSetChanged();
     }
 
     @Override

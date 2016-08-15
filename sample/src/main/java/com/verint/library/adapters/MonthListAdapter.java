@@ -3,6 +3,7 @@ package com.verint.library.adapters;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private boolean mLoadingInProgress;
 
     private List<Date> mData;
+
 
     public MonthListAdapter(@NonNull List<Date> data, @NonNull CalendarCallbacks listener){
 
@@ -88,6 +90,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             // Bind data to adapter
             ((MonthViewHolder) holder).mCalendarWidget
                     .set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));
+
 
         } else if (holder instanceof LoadingViewHolder){
 
@@ -148,7 +151,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void addItem(Date date){
 
         if (mData == null){
-            throw new IllegalStateException("Data list was not initialized");
+            throw new IllegalStateException("Data was not initialized");
         }
 
         mData.add(date);
@@ -164,7 +167,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void addItemAtBeginning(Date date){
 
         if (mData == null){
-            throw new IllegalStateException("Data list was not initialized");
+            throw new IllegalStateException("Data was not initialized");
         }
 
         mData.add(0, date);
@@ -180,7 +183,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void addItemAtTheEnd(Date date){
 
         if (mData == null){
-            throw new IllegalStateException("Data list was not initialized");
+            throw new IllegalStateException("Data was not initialized");
         }
 
         // Count
@@ -196,7 +199,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void removeLastItem(){
 
         if (mData == null){
-            throw new IllegalStateException("Data list was not initialized");
+            throw new IllegalStateException("Data was not initialized");
         }
 
         final int listCount = mData.size() - 1;
@@ -211,7 +214,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void removeFirstItem(){
 
         if (mData == null){
-            throw new IllegalStateException("Data list was not initialized");
+            throw new IllegalStateException("Data was not initialized");
         }
 
         mData.remove(0);
@@ -225,6 +228,10 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      * @param position position of item within list which should be removed
      */
     public void removeItem(final int position){
+
+        if (mData == null) {
+            throw new IllegalStateException("Data was not initialized");
+        }
 
         mData.remove(position);
         notifyItemRemoved(position);

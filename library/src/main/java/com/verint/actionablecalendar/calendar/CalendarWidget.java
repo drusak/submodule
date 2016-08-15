@@ -79,22 +79,16 @@ public class CalendarWidget extends LinearLayout {
 
     private void setMonthDays(@NonNull MixedVisibleMonth monthDate, CalendarBuilder factory){
 
-        if (mAdapter == null){ // Creation of new month representation
+        if (mAdapter == null){
 
             mAdapter = factory.createAdapterFor(monthDate);
             mGridView.setAdapter(mAdapter);
 
-            Day day = monthDate.getCurrentMonth().getDay(0);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(day.getDate());
+        } else {
 
-            // TODO: Remove before tests
-            Log.i(TAG, "Assign days for: "
-                    + CalendarUtils.getHumanFriendlyCalendarRepresentation(calendar));
-
-        } else { // Update of existing month representation
-
-            mAdapter.update(monthDate);
+            // Replace data within adapter
+            mAdapter.replace(monthDate);
+            mGridView.invalidateViews();
         }
     }
 }

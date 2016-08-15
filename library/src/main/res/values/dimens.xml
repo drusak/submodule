@@ -6,5 +6,6 @@
     <dimen name="calendar_item_shift_indicator_width">23dp</dimen>
     <dimen name="calendar_item_shift_indicator_height">4dp</dimen>
     <dimen name="calendar_item_date_title_padding_side">10dp</dimen>
-    <dimen name="calendar_item_date_title_padding_top_bottom">2dp</dimen>
+    <dimen name="calendar_item_date_title_padding_top_bottom">4dp</dimen>
+    <dimen name="weekday_widget_padding_vertical">3dp</dimen>
 </resources>

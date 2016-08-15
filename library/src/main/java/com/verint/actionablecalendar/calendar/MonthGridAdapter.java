@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.verint.mylibrary.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Makes adapting of model data to view by inflating related layouts and binding data accordingly
  *
@@ -19,13 +22,12 @@ import com.verint.mylibrary.R;
  */
 public class MonthGridAdapter extends BaseAdapter {
 
-    private int mGridItemLayoutId;
     private MixedVisibleMonth mMonthDate;
-    private int mSelectedPosition = -1;
     private CalendarCallbacks mListener;
+    private List<Day> mDayList;
 
-    private int mNormalDayBackgroundColorId;
-    private int mWeekendDayBackgroundColorId;
+    private int mGridItemLayoutId;
+    private int mSelectedPosition = -1;
 
     /**
      * Constructor, receives resource layout id for item and data to represent
@@ -35,50 +37,56 @@ public class MonthGridAdapter extends BaseAdapter {
      * @param listener {@link CalendarCallbacks} listener for click events
      */
     public MonthGridAdapter(@LayoutRes final int gridItemLayoutId,
-                            @NonNull MixedVisibleMonth monthDate,
-                            @NonNull CalendarCallbacks listener){
+                            @NonNull final MixedVisibleMonth monthDate,
+                            @NonNull final CalendarCallbacks listener){
 
         mGridItemLayoutId = gridItemLayoutId;
         mMonthDate = monthDate;
+        if (mDayList == null){
+            mDayList = new ArrayList<>();
+        }
+        mDayList.addAll(monthDate.getDayList());
         mListener = listener;
-
     }
-
 
     /**
      * Replace existing data set used by adapter to newly provided as an argument
      *
-     * @param monthDate {@link MixedVisibleMonth}
+     * @param dayList - list of  {@link Day} objects
      */
-    public void replace(MixedVisibleMonth monthDate){
+    public void replace(final List<Day> dayList){
 
-        if (monthDate == null){
+        if (mDayList == null){
             throw new IllegalArgumentException("Provided argument can't be  null");
         }
 
-        mMonthDate = monthDate;
+        if (!mDayList.isEmpty()) {
+            mDayList.clear();
+        }
+
+        mDayList.addAll(dayList);
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return mMonthDate.getCount();
+        return mDayList.size();
     }
 
     @Override
-    public Object getItem(int position) {
-
-        return mMonthDate.getDay(position);
+    public Object getItem(final int position) {
+        return mDayList.get(position);
     }
 
     @Override
-    public long getItemId(int position) {
+    public long getItemId(final int position) {
         return position;
     }
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
 
-        MonthGridViewHolder viewHolder;
+        final MonthGridViewHolder viewHolder;
 
         if (convertView == null){
 
@@ -95,7 +103,7 @@ public class MonthGridAdapter extends BaseAdapter {
             viewHolder = (MonthGridViewHolder) convertView.getTag();
         }
 
-        viewHolder.bind(mMonthDate.getDay(position), position, mListener);
+        viewHolder.bind(mDayList.get(position), position, mListener);
         return convertView;
     }
 
@@ -108,7 +116,7 @@ public class MonthGridAdapter extends BaseAdapter {
         protected AuctionBidView mAuctionBidView;
         protected ImageView mBidView;
 
-        MonthGridViewHolder(@NonNull final View view){
+        protected MonthGridViewHolder(@NonNull final View view){
             mRootView = view;
             mMonthDay = (TextView) view.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = view.findViewById(R.id.vMonthGridItemShiftIndicator);
@@ -125,8 +133,8 @@ public class MonthGridAdapter extends BaseAdapter {
                 case CURRENT_MONTH_DAY_NORMAL: // Current month
 
                     mMonthDay.setVisibility(View.VISIBLE);
-                    mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
-                    // mShiftIndicator.setVisibility(View.VISIBLE);
+                    mShiftIndicator.setVisibility(View.VISIBLE);
+                    // mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
                     mBidView.setVisibility(View.VISIBLE);
                     mAuctionBidView.setVisibility(View.VISIBLE);
 
@@ -172,7 +180,7 @@ public class MonthGridAdapter extends BaseAdapter {
                     mBidView.setVisibility(View.INVISIBLE);
                     mAuctionBidView.setVisibility(View.INVISIBLE);
 
-                    // TODO: Reimplement
+                    // TODO: Reimplement to use local field instead of parsing each time from the beginning
                     mRootView.setBackgroundColor(Color.parseColor("#ebebeb"));
 
                     // TODO: Consider adding click listeners for this specific view

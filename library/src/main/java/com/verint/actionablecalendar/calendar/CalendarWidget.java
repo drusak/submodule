@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -19,12 +18,12 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Represents calendar view with grid of days representing all days of current month, and partially
+ * next and previous months as well
  *
  * Created by acheshihin on 8/4/2016.
  */
 public class CalendarWidget extends LinearLayout {
-
-    private static final String TAG = CalendarWidget.class.getSimpleName();
 
     private TextView mDateTitle;
     private HeightWrapGridView mGridView;
@@ -51,23 +50,30 @@ public class CalendarWidget extends LinearLayout {
         init();
     }
 
-    private void init(){
-
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.calendar_widget, this, true);
-
-        mDateTitle = (TextView) view.findViewById(R.id.tvCalendarWidgetDateTitle);
-        mGridView = (HeightWrapGridView) view.findViewById(R.id.hwgvCalendarWidgetContent);
-    }
-
+    /**
+     * Assigns data to {@link CalendarWidget} view
+     *
+     * @param mixedMonth {@link MixedVisibleMonth} with data for {@link CalendarWidget} adapter
+     * @param factory {@link CalendarBuilder} required for creating {@link MonthGridAdapter}
+     */
     public void set(MixedVisibleMonth mixedMonth, CalendarBuilder factory){
-
-        // Assign generated year and month to related view
-        setMonthAndYearDate(mixedMonth.getCurrentMonth());
+        // Assign generated year and month title to related view
+        setMonthTitle(mixedMonth.getCurrentMonth());
         // Assign generated month days data to related view
         setMonthDays(mixedMonth, factory);
     }
 
-    private void setMonthAndYearDate(VisibleMonth currentMonth){
+    private void init(){
+
+        // Inflate provided layout
+        final View view
+                = LayoutInflater.from(getContext()).inflate(R.layout.calendar_widget, this, true);
+        // Set bridges from XML to java part
+        mDateTitle = (TextView) view.findViewById(R.id.tvCalendarWidgetDateTitle);
+        mGridView = (HeightWrapGridView) view.findViewById(R.id.hwgvCalendarWidgetContent);
+    }
+
+    private void setMonthTitle(VisibleMonth currentMonth){
 
         Date firstDayOfCurrentMonth = currentMonth.getDay(0).getDate();
         Calendar calendar = CalendarUtils.getCalendarFrom(firstDayOfCurrentMonth);
@@ -80,14 +86,13 @@ public class CalendarWidget extends LinearLayout {
     private void setMonthDays(@NonNull MixedVisibleMonth monthDate, CalendarBuilder factory){
 
         if (mAdapter == null){
-
+            // Create new adapter and assign it to view
             mAdapter = factory.createAdapterFor(monthDate);
             mGridView.setAdapter(mAdapter);
 
         } else {
-
-            // Replace data within adapter
-            mAdapter.replace(monthDate);
+            // Replace data of currently shown adapter and invalidate widget
+            mAdapter.replace(monthDate.getDayList());
             mGridView.invalidateViews();
         }
     }

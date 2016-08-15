@@ -1,9 +1,6 @@
 package com.verint.actionablecalendar.calendar;
 
-import android.support.annotation.NonNull;
-
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -28,9 +25,13 @@ public class MixedVisibleMonth {
      * @param currentMonth {@link VisibleMonth} current month
      * @param nextMonth {@link VisibleMonth} next month
      */
-    public MixedVisibleMonth(@NonNull final VisibleMonth previousMonth,
-                             @NonNull final VisibleMonth currentMonth,
-                             @NonNull final VisibleMonth nextMonth){
+    public MixedVisibleMonth(final VisibleMonth previousMonth,
+                             final VisibleMonth currentMonth,
+                             final VisibleMonth nextMonth){
+
+        if (previousMonth == null || currentMonth == null || nextMonth == null){
+            throw new IllegalArgumentException("Provided arguments can't be null");
+        }
 
         mPreviousMonth = previousMonth;
         mCurrentMonth = currentMonth;
@@ -100,26 +101,20 @@ public class MixedVisibleMonth {
         return mPreviousMonth.size() + mCurrentMonth.size() + mNextMonth.size();
     }
 
+    /**
+     * Returns content of {@code mPreviousMonth}, {@code mCurrentMonth}, {@code mNextMonth}
+     * as list of {@link Day} objects
+     *
+     * @return list of {@link Day}
+     */
+    public List<Day> getDayList(){
 
-    @Override
-    public String toString() {
+        final List<Day> dayList = new ArrayList<>();
 
-        StringBuilder builder = new StringBuilder();
+        dayList.addAll(mPreviousMonth.getDayList());
+        dayList.addAll(mCurrentMonth.getDayList());
+        dayList.addAll(mNextMonth.getDayList());
 
-        for (int i=0; i < mCurrentMonth.size(); i++){
-
-            if (i%7 == 0){
-                builder.append("[");
-            }
-            builder.append(mCurrentMonth.getDay(i).getCalendar().get(Calendar.DAY_OF_MONTH));
-            if (i%7 != 0){
-                builder.append(",");
-            }
-            if (i%7 == 6){
-                builder.append("]/n");
-            }
-        }
-
-        return builder.toString();
+        return dayList;
     }
 }

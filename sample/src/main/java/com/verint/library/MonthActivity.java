@@ -8,7 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.verint.actionablecalendar.calendar.CalendarBuilder;
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
+import com.verint.actionablecalendar.calendar.CalendarDataFactory;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.Day;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
@@ -42,8 +44,6 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private MonthListAdapter mAdapter;
-
-    private List<Date> mMonthDateList;
     private List<MixedVisibleMonth> mMonthList;
 
     private Runnable mLoadMoreRunnable;
@@ -59,7 +59,21 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
 
     private void performTestUpdate(@NonNull Date date){
 
-        Calendar calendar = CalendarUtils.getCalendarFrom(date);
+        final MixedVisibleMonth month = CalendarDataFactory.newInstance().create(date);
+        month.getCurrentMonth().getDay(0).setShiftEnabled(true);
+        month.getCurrentMonth().getDay(1).setShiftEnabled(true);
+        month.getCurrentMonth().getDay(2).setShiftEnabled(true);
+
+        final int currentMonthPosition = mAdapter.getCurrentMonthPosition();
+
+        mAdapter.addItemAtPosition(currentMonthPosition, month);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(MonthActivity.this, "Starting test", Toast.LENGTH_SHORT).show();
+        // super.onBackPressed();
+        performTestUpdate(new Date(System.currentTimeMillis()));
     }
 
     private void init() {
@@ -72,8 +86,7 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
         mLayoutManager = new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false);
         // TODO: Consider passing {@link RecyclerView} and adding listener inside of adapter
-        mAdapter = new MonthListAdapter(mMonthDateList, MonthActivity.this);
-        // mAdapter.setHasStableIds(true);
+        mAdapter = new MonthListAdapter(mMonthList, MonthActivity.this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
@@ -159,15 +172,20 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
 
     private void initMonthListForDate(@NonNull Date date){
 
-        if (mMonthDateList == null){
-            mMonthDateList = new ArrayList<>();
+        if (mMonthList == null){
+            mMonthList = new ArrayList<>();
         }
 
-        if (!mMonthDateList.isEmpty()){
-            mMonthDateList.clear();
+        if (!mMonthList.isEmpty()){
+            mMonthList.clear();
         }
 
-        mMonthDateList.addAll(CalendarUtils.generateInitialMonthList(date));
+
+        List<Date> monthDateList = CalendarUtils.generateInitialMonthList(date);
+        for (Date each : monthDateList){
+            mMonthList.add(CalendarDataFactory.newInstance().create(each));
+        }
+        // mMonthList.addAll(CalendarUtils.generateInitialMonthList(date));
     }
 
     private void initWeekDayNames(){
@@ -205,13 +223,14 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                         activity.mAdapter.removeLastItem();
 
                         // Load more
-                        int listCount = activity.mMonthDateList.size();
+                        int listCount = activity.mMonthList.size();
                         int newListCount = listCount + VISIBLE_THRESHOLD;
 
                         for (int i=listCount; i < newListCount; i++){
                             // Get current last item
-                            final Date lastItemDate = activity.mMonthDateList.get(i-1);
-                            activity.mAdapter.addItemAtTheEnd(CalendarUtils.getNextMonth(lastItemDate));
+                            final MixedVisibleMonth lastItemDate = activity.mMonthList.get(i-1);
+                            // activity.mAdapter.addItemAtTheEnd(CalendarUtils.getNextMonth(lastItemDate));
+                            activity.mAdapter.addItemAtTheEnd(CalendarDataFactory.newInstance().create(CalendarUtils.getNextMonth(lastItemDate.getCurrentMonth().getDay(0).getDate())));
                         }
                         break;
 
@@ -223,8 +242,9 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                         // Load more
                         for (int i=0; i < VISIBLE_THRESHOLD; i++){
                             // Get current first item
-                            final Date firstItemDate = activity.mMonthDateList.get(0);
-                            activity.mAdapter.addItemAtBeginning(CalendarUtils.getPreviousMonth(firstItemDate));
+                            final MixedVisibleMonth firstItemDate = activity.mMonthList.get(0);
+                            // activity.mAdapter.addItemAtBeginning(CalendarUtils.getPreviousMonth(firstItemDate));
+                            activity.mAdapter.addItemAtBeginning(CalendarDataFactory.newInstance().create(CalendarUtils.getPreviousMonth(firstItemDate.getCurrentMonth().getDay(0).getDate())));
                         }
                         break;
 

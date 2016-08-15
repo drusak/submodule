@@ -133,8 +133,8 @@ public class MonthGridAdapter extends BaseAdapter {
                 case CURRENT_MONTH_DAY_NORMAL: // Current month
 
                     mMonthDay.setVisibility(View.VISIBLE);
-                    mShiftIndicator.setVisibility(View.VISIBLE);
-                    // mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
+                    // mShiftIndicator.setVisibility(View.VISIBLE);
+                    mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
                     mBidView.setVisibility(View.VISIBLE);
                     mAuctionBidView.setVisibility(View.VISIBLE);
 

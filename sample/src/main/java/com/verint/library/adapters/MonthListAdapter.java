@@ -42,11 +42,14 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private boolean mLoadingInProgress;
 
-    private final List<Date> mData;
+    private final List<MixedVisibleMonth> mData;
 
-
-    public MonthListAdapter(@NonNull List<Date> data,
+    public MonthListAdapter(List<MixedVisibleMonth> data,
                             @NonNull CalendarCallbacks listener){
+
+        if (data == null){
+            throw new IllegalArgumentException("Provided data argument is null");
+        }
 
         mData = data;
         mListener = listener;
@@ -60,13 +63,6 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void setOnLoadMoreListener(@NonNull OnLoadMoreListener listener){
         mOnLoadMoreListener = listener;
     }
-
-    /*@Override
-    public long getItemId(int position) {
-
-        final Date date = mData.get(position);
-        return date != null ? date.getTime() : -1L;
-    }*/
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -90,12 +86,17 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         if (holder instanceof MonthViewHolder){
 
-            // Build days object for representation
+            MixedVisibleMonth month = getListItem(position);
+            // Bind data to adapter
+            ((MonthViewHolder) holder).mCalendarWidget
+                    .set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));
+
+            /*// Build days object for representation
             MixedVisibleMonth month = CalendarDataFactory.newInstance()
                     .create(CalendarUtils.getCalendarFrom(getListItem(position)).getTime());
             // Bind data to adapter
             ((MonthViewHolder) holder).mCalendarWidget
-                    .set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));
+                    .set(month, new CalendarBuilder(R.layout.month_grid_item, mListener));*/
 
 
         } else if (holder instanceof LoadingViewHolder){
@@ -135,9 +136,11 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         int itemCount = getItemCount();
         for (int i=0; i < itemCount; i++){
-            final Date currentItem = getListItem(i);
-            if (currentItem != null){ // If loader item it will be null, hence skip iteration for it
-                Calendar dateCalendar = CalendarUtils.getCalendarFrom(getListItem(i));
+
+            final MixedVisibleMonth month = getListItem(i);
+            if (month != null){ // If loader item it will be null, hence skip iteration for it
+
+                Calendar dateCalendar = month.getCurrentMonth().getDay(0).getCalendar();
                 if (dateCalendar.get(Calendar.MONTH) == currentMonth
                         && dateCalendar.get(Calendar.YEAR) == currentYear){
                     return i;
@@ -149,44 +152,44 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     /**
-     * Adds {@link Date} item to data list at last position and notifies adapter that data
+     * Adds {@link MixedVisibleMonth} item to data list at last position and notifies adapter that data
      * was changed
      *
-     * @param date {@link Date}|null
+     * @param month {@link MixedVisibleMonth}|null
      */
-    public void addItem(Date date){
+    public void addItem(MixedVisibleMonth month){
 
         if (mData == null){
             throw new IllegalStateException("Data was not initialized");
         }
 
-        mData.add(date);
+        mData.add(month);
         notifyItemInserted(mData.size()-1);
     }
 
     /**
-     * Adds {@link Date} item to data list at position 0 and notifies adapter that item was
+     * Adds {@link MixedVisibleMonth} item to data list at position 0 and notifies adapter that item was
      * inserted
      *
-     * @param date {@link Date}|null
+     * @param month {@link MixedVisibleMonth}|null
      */
-    public void addItemAtBeginning(final Date date){
+    public void addItemAtBeginning(final MixedVisibleMonth month){
 
         if (mData == null){
             throw new IllegalStateException("Data was not initialized");
         }
 
-        mData.add(0, date);
+        mData.add(0, month);
         notifyItemInserted(0);
     }
 
     /**
-     * Adds {@link Date} item to data list at the position of the end of the list and notifies that
+     * Adds {@link MixedVisibleMonth} item to data list at the position of the end of the list and notifies that
      * item was inserted at the end of list
      *
-     * @param date {@link Date}|null
+     * @param month {@link MixedVisibleMonth}|null
      */
-    public void addItemAtTheEnd(final Date date){
+    public void addItemAtTheEnd(final MixedVisibleMonth month){
 
         if (mData == null){
             throw new IllegalStateException("Data was not initialized");
@@ -194,12 +197,12 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         // Count
         final int listCount = mData.size() - 1;
-        mData.add(date);
+        mData.add(month);
         notifyItemInserted(listCount + 1);
     }
 
     /**
-     * Removes {@link Date} item from the data list's last position and notifies adapter that
+     * Removes {@link MixedVisibleMonth} item from the data list's last position and notifies adapter that
      * item at the end of list was removed
      */
     public void removeLastItem(){
@@ -214,7 +217,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     /**
-     * Removes {@link Date} item from the data list's last position and notifies adapter that
+     * Removes {@link MixedVisibleMonth} item from the data list's last position and notifies adapter that
      * item at the end of list was removed
      */
     public void removeFirstItem(){
@@ -227,8 +230,18 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemRemoved(0);
     }
 
+    public void addItemAtPosition(final int position, @NonNull MixedVisibleMonth newMonth){
+
+        if (mData == null) {
+            throw new IllegalStateException("Data was not initialized");
+        }
+
+        mData.set(position, newMonth);
+        notifyItemChanged(position);
+    }
+
     /**
-     * Removes {@link Date} item from data list at the desired position and notifies adapter regarding
+     * Removes {@link MixedVisibleMonth} item from data list at the desired position and notifies adapter regarding
      * the data change
      *
      * @param position position of item within list which should be removed
@@ -243,7 +256,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemRemoved(position);
     }
 
-    private Date getListItem(final int position){
+    private MixedVisibleMonth getListItem(final int position){
 
         if (getItemCount() < position){
             throw new IllegalArgumentException("Position is out of bounds");

@@ -1,7 +1,6 @@
 package com.verint.library;
 
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import static com.verint.library.adapters.MonthListAdapter.VISIBLE_THRESHOLD;
 
@@ -34,10 +32,10 @@ import static com.verint.library.adapters.MonthListAdapter.VISIBLE_THRESHOLD;
  * Represents list of {@link com.verint.actionablecalendar.calendar.CalendarWidget} widgets
  * according to predefined date range
  */
-public class MonthActivity extends AppCompatActivity
-        implements CalendarCallbacks, OnLoadMoreListener{
+public class MonthActivity extends AppCompatActivity implements CalendarCallbacks,
+        OnLoadMoreListener{
 
-    // Week day name related fields
+    // Title of week days above list of {@link CalendarWidget}
     private WeekDayWidget mWeekDayWidget;
 
     // Calendar related fields
@@ -46,7 +44,6 @@ public class MonthActivity extends AppCompatActivity
     private MonthListAdapter mAdapter;
 
     private List<Date> mMonthDateList;
-
     private List<MixedVisibleMonth> mMonthList;
 
     private Runnable mLoadMoreRunnable;
@@ -60,6 +57,11 @@ public class MonthActivity extends AppCompatActivity
         initWeekDayNames();
     }
 
+    private void performTestUpdate(@NonNull Date date){
+
+        Calendar calendar = CalendarUtils.getCalendarFrom(date);
+    }
+
     private void init() {
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rvMainActivityMonthList);
@@ -69,16 +71,16 @@ public class MonthActivity extends AppCompatActivity
 
         mLayoutManager = new LinearLayoutManager(getApplicationContext(),
                 LinearLayoutManager.VERTICAL, false);
+        // TODO: Consider passing {@link RecyclerView} and adding listener inside of adapter
         mAdapter = new MonthListAdapter(mMonthDateList, MonthActivity.this);
+        // mAdapter.setHasStableIds(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
 
-        // TODO: Consider implementing dedicated method to scroll to specific month
-        mRecyclerView.scrollToPosition(mAdapter.getCurrentMonthPosition());
-
         // Provide listener for load more flow
         mAdapter.setOnLoadMoreListener(MonthActivity.this);
+
         // Specify listener for scroll events in order to differentiate scroll direction
         mRecyclerView.addOnScrollListener(new OnListScrollDirectionalListener(mRecyclerView) {
 
@@ -98,6 +100,12 @@ public class MonthActivity extends AppCompatActivity
                 }
             }
         });
+
+        // Scroll to current month if such month exists within currently set data list
+        final int currentMonthPosition = mAdapter.getCurrentMonthPosition();
+        if (RecyclerView.NO_POSITION != currentMonthPosition){
+            mRecyclerView.scrollToPosition(currentMonthPosition);
+        }
     }
 
     // {@link CalendarCallbacks} region begin
@@ -106,13 +114,8 @@ public class MonthActivity extends AppCompatActivity
     public void onCalendarItemClick(@NonNull Day day, int position) {
 
         Calendar calendar = CalendarUtils.getCalendarFrom(day.getDate());
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int monthDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-        String date = String.format(Locale.getDefault(), "%d/%d/%d", monthDay, month, year);
-
-        Toast.makeText(getApplicationContext(), "click " + date
+        Toast.makeText(getApplicationContext(), "click "
+                + CalendarUtils.getHumanFriendlyCalendarRepresentation(calendar)
                 + ", position: " + position, Toast.LENGTH_SHORT).show();
     }
 
@@ -120,13 +123,8 @@ public class MonthActivity extends AppCompatActivity
     public void onCalendarItemLongClick(@NonNull Day day, int position) {
 
         Calendar calendar = CalendarUtils.getCalendarFrom(day.getDate());
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int monthDay = calendar.get(Calendar.DAY_OF_MONTH);
-
-        String date = String.format(Locale.getDefault(), "%d/%d/%d", monthDay, month, year);
-
-        Toast.makeText(getApplicationContext(), "long click " + date
+        Toast.makeText(getApplicationContext(), "long click "
+                + CalendarUtils.getHumanFriendlyCalendarRepresentation(calendar)
                 + ", position: " + position, Toast.LENGTH_SHORT).show();
     }
 
@@ -180,27 +178,6 @@ public class MonthActivity extends AppCompatActivity
     }
 
     // --------------------------------------------------------------------------------------------
-    protected static class MoreLoaderHandler extends Handler {
-
-        private WeakReference<MonthActivity> mMonthActivity;
-
-        public MoreLoaderHandler(@NonNull MonthActivity activity){
-            mMonthActivity = new WeakReference<MonthActivity>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-
-
-        @Override
-        public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
-            return super.sendMessageAtTime(msg, uptimeMillis);
-        }
-    }
-
-    // --------------------------------------------------------------------------------------------
     protected static class LoadMoreRunnable implements Runnable {
 
         private WeakReference<MonthActivity> mMonthActivity;
@@ -209,7 +186,7 @@ public class MonthActivity extends AppCompatActivity
         protected LoadMoreRunnable(@NonNull MonthActivity activity,
                                    @NonNull final Direction scrollDirection){
 
-            mMonthActivity = new WeakReference<MonthActivity>(activity);
+            mMonthActivity = new WeakReference<>(activity);
             mScrollDirection = scrollDirection;
         }
 

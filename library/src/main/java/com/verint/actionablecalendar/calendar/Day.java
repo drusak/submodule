@@ -2,6 +2,10 @@ package com.verint.actionablecalendar.calendar;
 
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
+import android.widget.ImageView;
+
+import com.verint.actionablecalendar.calendar.models.AuctionBid;
+import com.verint.actionablecalendar.calendar.models.Bid;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -18,7 +22,10 @@ public class Day {
     private DayState mDayState;
     private Calendar mCalendar;
 
+    // TODO: Reimplement to production data when will be ready
     private boolean mShiftEnabled;
+    private AuctionBid mAuctionBid;
+    private Bid mBid;
 
     public Day(final Date date, @NonNull DayState dayState){
 

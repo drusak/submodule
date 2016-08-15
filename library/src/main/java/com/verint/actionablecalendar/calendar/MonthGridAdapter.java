@@ -172,8 +172,8 @@ public class MonthGridAdapter extends BaseAdapter {
                 case CURRENT_MONTH_DAY_WEEKEND: // Week end
 
                     // Change day value text color
-                    mMonthDay.setTextColor(CalendarUtils.isToday(day) ? Color.RED : Color.BLACK);
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
+                    mMonthDay.setTextColor(CalendarUtils.isToday(day) ? Color.RED : Color.BLACK);
 
                     mMonthDay.setVisibility(View.VISIBLE);
                     mShiftIndicator.setVisibility(View.INVISIBLE);
@@ -190,9 +190,6 @@ public class MonthGridAdapter extends BaseAdapter {
                     break;
 
                 case NON_CURRENT_MONTH_DAY: // Previous or next month
-
-                    // TODO: Consider remove binding of text since visibility will be changed anyway
-                    // mMonthDay.setText("");
 
                     mMonthDay.setVisibility(View.INVISIBLE);
                     mShiftIndicator.setVisibility(View.INVISIBLE);

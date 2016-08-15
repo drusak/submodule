@@ -32,8 +32,7 @@ import java.util.List;
 public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements OnMonthListScrollListener {
 
-    private static final String TAG = MonthListAdapter.class.getSimpleName();
-
+    // This constant specifies amount of items to load when user approaching the end of the list
     public static final int VISIBLE_THRESHOLD = 3;
 
     private static final int VIEW_TYPE_ITEM = 0;
@@ -47,7 +46,8 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private List<Date> mData;
 
 
-    public MonthListAdapter(@NonNull List<Date> data, @NonNull CalendarCallbacks listener){
+    public MonthListAdapter(@NonNull List<Date> data,
+                            @NonNull CalendarCallbacks listener){
 
         mData = data;
         mListener = listener;
@@ -61,6 +61,13 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void setOnLoadMoreListener(@NonNull OnLoadMoreListener listener){
         mOnLoadMoreListener = listener;
     }
+
+    /*@Override
+    public long getItemId(int position) {
+
+        final Date date = mData.get(position);
+        return date != null ? date.getTime() : -1L;
+    }*/
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

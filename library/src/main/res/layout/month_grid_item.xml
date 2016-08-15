@@ -30,7 +30,7 @@
     <!-- TODO: Add here additional widgets -->
 
     <com.verint.actionablecalendar.calendar.AuctionBidView
-        android:id="@+id/abvCalendarActionBidView"
+        android:id="@+id/abvCalendarAuctionBidView"
         android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
         android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
         android:layout_centerHorizontal="true"

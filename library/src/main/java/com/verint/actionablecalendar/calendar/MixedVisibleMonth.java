@@ -7,6 +7,9 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
+ * Contains data required to represent single month and partially previous and next month as well
+ * when current month not starts at the beginning of row and not finishes at the end
+ *
  * Created by acheshihin on 8/4/2016.
  */
 public class MixedVisibleMonth {

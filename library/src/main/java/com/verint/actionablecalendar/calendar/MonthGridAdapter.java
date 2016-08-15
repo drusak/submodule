@@ -97,33 +97,33 @@ public class MonthGridAdapter extends BaseAdapter {
     // --------------------------------------------------------------------------------------------
     protected static class MonthGridViewHolder {
 
-        View mRootView;
-        TextView mMonthDay;
-        View mShiftIndicator;
-        View mActionBidView;
-        ImageView mBidView;
+        protected View mRootView;
+        protected TextView mMonthDay;
+        protected View mShiftIndicator;
+        protected AuctionBidView mAuctionBidView;
+        protected ImageView mBidView;
 
         MonthGridViewHolder(@NonNull final View view){
-            
             mRootView = view;
             mMonthDay = (TextView) view.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = view.findViewById(R.id.vMonthGridItemShiftIndicator);
-            mActionBidView = view.findViewById(R.id.abvCalendarActionBidView);
+            mAuctionBidView = (AuctionBidView) view.findViewById(R.id.abvCalendarAuctionBidView);
             mBidView = (ImageView) view.findViewById(R.id.ivCalendarBidView);
         }
 
-        public void bind(@NonNull final Day day,
+        protected void bind(@NonNull final Day day,
                          final int position,
                          final CalendarCallbacks listener){
 
             switch (day.getDayState().getType()){
 
-                case CURRENT_MONTH_DAY_NORMAL:
+                case CURRENT_MONTH_DAY_NORMAL: // Current month
 
                     mMonthDay.setVisibility(View.VISIBLE);
-                    mShiftIndicator.setVisibility(View.VISIBLE);
+                    mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
+                    // mShiftIndicator.setVisibility(View.VISIBLE);
                     mBidView.setVisibility(View.VISIBLE);
-                    mActionBidView.setVisibility(View.VISIBLE);
+                    mAuctionBidView.setVisibility(View.VISIBLE);
 
                     // Change background color
                     mRootView.setBackgroundColor(Color.WHITE);
@@ -156,7 +156,7 @@ public class MonthGridAdapter extends BaseAdapter {
                     });
                     break;
 
-                case CURRENT_MONTH_DAY_WEEKEND:
+                case CURRENT_MONTH_DAY_WEEKEND: // Week end
 
                     // Change day value text color
                     mMonthDay.setTextColor(CalendarUtils.isToday(day) ? Color.RED : Color.BLACK);
@@ -165,7 +165,7 @@ public class MonthGridAdapter extends BaseAdapter {
                     mMonthDay.setVisibility(View.VISIBLE);
                     mShiftIndicator.setVisibility(View.INVISIBLE);
                     mBidView.setVisibility(View.INVISIBLE);
-                    mActionBidView.setVisibility(View.INVISIBLE);
+                    mAuctionBidView.setVisibility(View.INVISIBLE);
 
                     // TODO: Reimplement
                     mRootView.setBackgroundColor(Color.parseColor("#ebebeb"));
@@ -176,7 +176,7 @@ public class MonthGridAdapter extends BaseAdapter {
                     mRootView.setOnLongClickListener(null);
                     break;
 
-                case NON_CURRENT_MONTH_DAY:
+                case NON_CURRENT_MONTH_DAY: // Previous or next month
 
                     // TODO: Consider remove binding of text since visibility will be changed anyway
                     // mMonthDay.setText("");
@@ -184,7 +184,7 @@ public class MonthGridAdapter extends BaseAdapter {
                     mMonthDay.setVisibility(View.INVISIBLE);
                     mShiftIndicator.setVisibility(View.INVISIBLE);
                     mBidView.setVisibility(View.INVISIBLE);
-                    mActionBidView.setVisibility(View.INVISIBLE);
+                    mAuctionBidView.setVisibility(View.INVISIBLE);
 
                     mRootView.setBackgroundColor(Color.WHITE);
 

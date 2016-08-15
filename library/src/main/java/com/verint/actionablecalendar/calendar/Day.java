@@ -18,6 +18,8 @@ public class Day {
     private DayState mDayState;
     private Calendar mCalendar;
 
+    private boolean mShiftEnabled;
+
     public Day(final Date date, @NonNull DayState dayState){
 
         if (date == null){
@@ -25,8 +27,8 @@ public class Day {
         }
 
         mDate = date;
-        mCalendar = CalendarUtils.getCalendarFrom(date);
         mDayState = dayState;
+        mCalendar = CalendarUtils.getCalendarFrom(date);
     }
 
     public Calendar getCalendar(){
@@ -66,5 +68,13 @@ public class Day {
             throw new IllegalStateException("Day was not initialized");
         }
         return DateUtils.isToday(mDate.getTime());
+    }
+
+    public boolean isShiftEnabled(){
+        return mShiftEnabled;
+    }
+
+    public void setShiftEnabled(boolean shiftEnabled){
+        mShiftEnabled = shiftEnabled;
     }
 }

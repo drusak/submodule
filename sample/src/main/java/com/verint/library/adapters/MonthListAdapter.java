@@ -43,12 +43,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private boolean mLoadingInProgress;
 
-    private int mFirstVisibleItem;
-    private int mLastVisibleItem;
-    private int mTotalItemCount;
-
     private List<Date> mData;
-
 
     public MonthListAdapter(@NonNull List<Date> data, @NonNull CalendarCallbacks listener){
 
@@ -227,7 +222,7 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      * Removes {@link Date} item from data list at the desired position and notifies adapter regarding
      * the data change
      *
-     * @param position
+     * @param position position of item within list which should be removed
      */
     public void removeItem(final int position){
 
@@ -270,8 +265,8 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         switch (scrollDirection){
 
             case UP:
-                mFirstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-                if (!mLoadingInProgress && (mFirstVisibleItem - VISIBLE_THRESHOLD) <= 0){
+                final int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+                if (!mLoadingInProgress && (firstVisibleItemPosition - VISIBLE_THRESHOLD) <= 0){
                     if (mOnLoadMoreListener != null){
                         mOnLoadMoreListener.onLoadMore(scrollDirection);
                     }
@@ -280,11 +275,10 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 break;
 
             case DOWN:
+                final int totalItemCount = linearLayoutManager.getItemCount();
+                final int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
 
-                mTotalItemCount = linearLayoutManager.getItemCount();
-                mLastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-
-                if (!mLoadingInProgress && mTotalItemCount <= (mLastVisibleItem + VISIBLE_THRESHOLD)){
+                if (!mLoadingInProgress && totalItemCount <= (lastVisibleItemPosition + VISIBLE_THRESHOLD)){
                     if (mOnLoadMoreListener != null){
                         mOnLoadMoreListener.onLoadMore(scrollDirection);
                     }
@@ -300,22 +294,22 @@ public class MonthListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     // {@link OnMonthListScrollListener} region end
 
     // --------------------------------------------------------------------------------------------
-    public static class LoadingViewHolder extends RecyclerView.ViewHolder {
+    protected static class LoadingViewHolder extends RecyclerView.ViewHolder {
 
-        public ProgressBar mProgressBar;
+        protected ProgressBar mProgressBar;
 
-        public LoadingViewHolder(View itemView) {
+        protected LoadingViewHolder(View itemView) {
             super(itemView);
             mProgressBar = (ProgressBar) itemView.findViewById(R.id.pbMonthListItemLoadingProgressBar);
         }
     }
 
     // --------------------------------------------------------------------------------------------
-    public static class MonthViewHolder extends RecyclerView.ViewHolder {
+    protected static class MonthViewHolder extends RecyclerView.ViewHolder {
 
-        public CalendarWidget mCalendarWidget;
+        protected CalendarWidget mCalendarWidget;
 
-        public MonthViewHolder(View itemView) {
+        protected MonthViewHolder(View itemView) {
             super(itemView);
             mCalendarWidget = (CalendarWidget) itemView.findViewById(R.id.cwMonthListItem);
         }

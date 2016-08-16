@@ -2,6 +2,7 @@ package com.verint.actionablecalendar.calendar;
 
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -193,7 +194,7 @@ public class CalendarUtils {
     public static Calendar getCalendarForToday(){
 
         Calendar calendar = (Calendar) CALENDAR.clone();
-        calendar.setTime(new Date(System.currentTimeMillis()));
+        calendar.setTimeInMillis(System.currentTimeMillis());
         return calendar;
     }
 
@@ -203,12 +204,30 @@ public class CalendarUtils {
      * @param day {@link Day}
      * @return true|false
      */
-    public static boolean isToday(@NonNull Day day){
+    /*public static boolean isToday(@NonNull final Day day){
 
         return DateUtils.isToday(day.getDate().getTime());
+    }*/
+
+    /**
+     * Checks if provided day is today and returns result accordingly
+     *
+     * @param day {@link Day}
+     * @return true|false
+     */
+    public static boolean isToday(@NonNull final Day day){
+
+        // return DateUtils.isToday(day.getDate().getTime());
+        final Calendar todayCalendar = (Calendar) CALENDAR.clone();
+        todayCalendar.setTimeInMillis(System.currentTimeMillis());
+
+        final Calendar checkedCalendar = day.getCalendar();
+        return todayCalendar.get(Calendar.YEAR) == checkedCalendar.get(Calendar.YEAR)
+                &&  todayCalendar.get(Calendar.MONTH) == checkedCalendar.get(Calendar.MONTH)
+                && todayCalendar.get(Calendar.DAY_OF_MONTH) == checkedCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    public static List<Date> generateInitialMonthList(@NonNull Date desiredDate){
+    public static List<Date> generateInitialMonthList(@NonNull final Date desiredDate){
 
         final Date previousMonth = CalendarUtils.getPreviousMonth(desiredDate);
         final Date nextMonth = CalendarUtils.getNextMonth(desiredDate);

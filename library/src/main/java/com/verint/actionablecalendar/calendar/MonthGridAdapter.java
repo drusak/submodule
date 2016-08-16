@@ -3,6 +3,7 @@ package com.verint.actionablecalendar.calendar;
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import java.util.List;
  * Created by acheshihin on 8/3/2016.
  */
 public class MonthGridAdapter extends BaseAdapter {
+
+    private static final String TAG = MonthGridAdapter.class.getSimpleName();
 
     private MixedVisibleMonth mMonthDate;
     private CalendarCallbacks mListener;
@@ -117,6 +120,7 @@ public class MonthGridAdapter extends BaseAdapter {
         protected ImageView mBidView;
 
         protected MonthGridViewHolder(@NonNull final View view){
+
             mRootView = view;
             mMonthDay = (TextView) view.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = view.findViewById(R.id.vMonthGridItemShiftIndicator);
@@ -124,25 +128,25 @@ public class MonthGridAdapter extends BaseAdapter {
             mBidView = (ImageView) view.findViewById(R.id.ivCalendarBidView);
         }
 
-        protected void bind(@NonNull final Day day,
-                         final int position,
+        protected void bind(@NonNull final Day day, final int position,
                          final CalendarCallbacks listener){
 
             switch (day.getDayState().getType()){
 
-                case CURRENT_MONTH_DAY_NORMAL: // Current month
+                case CURRENT_MONTH_DAY_NORMAL: // Current month day
 
                     mMonthDay.setVisibility(View.VISIBLE);
-                    // mShiftIndicator.setVisibility(View.VISIBLE);
                     mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
                     mBidView.setVisibility(View.VISIBLE);
                     mAuctionBidView.setVisibility(View.VISIBLE);
 
-                    // Change background color
-                    mRootView.setBackgroundColor(Color.WHITE);
-                    // Change day value text color
-                    mMonthDay.setTextColor(CalendarUtils.isToday(day) ? Color.RED : Color.BLACK);
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
+
+                    if (!CalendarUtils.isToday(day)){ // Not today
+                        mRootView.setBackgroundColor(Color.WHITE);
+                    } else { // Today
+                        mRootView.setBackgroundResource(R.drawable.calendar_item_current_day_background);
+                    }
 
                     // Specify click listeners
                     mRootView.setOnClickListener(new View.OnClickListener() {
@@ -167,26 +171,48 @@ public class MonthGridAdapter extends BaseAdapter {
                             return true;
                         }
                     });
+
                     break;
 
-                case CURRENT_MONTH_DAY_WEEKEND: // Week end
+                case CURRENT_MONTH_DAY_WEEKEND: // Current month week end day
+
+                    mMonthDay.setVisibility(View.VISIBLE);
+                    mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
+                    mBidView.setVisibility(View.VISIBLE);
+                    mAuctionBidView.setVisibility(View.VISIBLE);
 
                     // Change day value text color
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
-                    mMonthDay.setTextColor(CalendarUtils.isToday(day) ? Color.RED : Color.BLACK);
 
-                    mMonthDay.setVisibility(View.VISIBLE);
-                    mShiftIndicator.setVisibility(View.INVISIBLE);
-                    mBidView.setVisibility(View.INVISIBLE);
-                    mAuctionBidView.setVisibility(View.INVISIBLE);
+                    if (!CalendarUtils.isToday(day)){ // Not today
+                        mRootView.setBackgroundColor(Color.parseColor("#ebebeb"));
+                    } else { // Today
+                        mRootView.setBackgroundResource(R.drawable.calendar_item_current_day_background);
+                    }
 
-                    // TODO: Reimplement to use local field instead of parsing each time from the beginning
-                    mRootView.setBackgroundColor(Color.parseColor("#ebebeb"));
+                    // Specify click listeners
+                    mRootView.setOnClickListener(new View.OnClickListener() {
 
-                    // TODO: Consider adding click listeners for this specific view
-                    // Remove click listeners
-                    mRootView.setOnClickListener(null);
-                    mRootView.setOnLongClickListener(null);
+                        @Override
+                        public void onClick(View v) {
+
+                            if (listener != null){
+                                listener.onCalendarItemClick(day, position);
+                            }
+                        }
+                    });
+
+                    mRootView.setOnLongClickListener(new View.OnLongClickListener() {
+
+                        @Override
+                        public boolean onLongClick(View v) {
+
+                            if (listener != null){
+                                listener.onCalendarItemLongClick(day, position);
+                            }
+                            return true;
+                        }
+                    });
                     break;
 
                 case NON_CURRENT_MONTH_DAY: // Previous or next month

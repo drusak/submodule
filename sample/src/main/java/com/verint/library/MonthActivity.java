@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.verint.actionablecalendar.calendar.CalendarBuilder;
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
 import com.verint.actionablecalendar.calendar.CalendarDataFactory;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
@@ -71,7 +70,7 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(MonthActivity.this, "Starting test", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MonthActivity.this, "Changing current month shifts", Toast.LENGTH_SHORT).show();
         // super.onBackPressed();
         performTestUpdate(new Date(System.currentTimeMillis()));
     }

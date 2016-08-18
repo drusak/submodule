@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 /**
- *
+ * TODO: Add JavaDoc
  *
  * Created by acheshihin on 8/14/2016.
  */

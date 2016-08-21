@@ -3,7 +3,6 @@ package com.verint.actionablecalendar.calendar;
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,6 +139,18 @@ public class MonthGridAdapter extends BaseAdapter {
                     mBidView.setVisibility(View.VISIBLE);
                     mAuctionBidView.setVisibility(View.VISIBLE);
 
+                    // TODO: Implement later real binding of auction and bid and badge images
+                    if (day.getBid() == null){
+                        mBidView.setImageResource(0);
+                    }
+                    if (day.getAuctionBid() == null){
+                        mAuctionBidView.setImage(0);
+                        mAuctionBidView.setBadge(0);
+                    }
+                    // mBidView.setImageResource(day.getBid().getBidImage());
+                    // mAuctionBidView.setImage(day.getAuctionBid().getAuctionImage());
+                    // mAuctionBidView.setBadge(day.getAuctionBid().getBadgeImage());
+
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
 
                     if (!CalendarUtils.isToday(day)){ // Not today
@@ -180,6 +191,18 @@ public class MonthGridAdapter extends BaseAdapter {
                     mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
                     mBidView.setVisibility(View.VISIBLE);
                     mAuctionBidView.setVisibility(View.VISIBLE);
+
+                    // TODO: Implement later real binding of auction and bid and badge images
+                    if (day.getBid() == null){
+                        mBidView.setImageResource(0);
+                    }
+                    if (day.getAuctionBid() == null){
+                        mAuctionBidView.setImage(0);
+                        mAuctionBidView.setBadge(0);
+                    }
+                    // mBidView.setImageResource(day.getBid().getBidImage());
+                    // mAuctionBidView.setImage(day.getAuctionBid().getAuctionImage());
+                    // mAuctionBidView.setBadge(day.getAuctionBid().getBadgeImage());
 
                     // Change day value text color
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));

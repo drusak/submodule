@@ -8,5 +8,6 @@ package com.verint.actionablecalendar.calendar.models;
  */
 public enum Direction {
     UP,
-    DOWN
+    DOWN,
+    NONE
 }

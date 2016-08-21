@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 
 import com.verint.actionablecalendar.calendar.CalendarBuilder;
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
-import com.verint.actionablecalendar.calendar.CalendarDataFactory;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.CalendarWidget;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
@@ -20,7 +19,6 @@ import com.verint.library.listeners.OnLoadMoreListener;
 import com.verint.library.listeners.OnMonthListScrollListener;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**

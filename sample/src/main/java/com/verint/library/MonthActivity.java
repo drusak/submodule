@@ -159,6 +159,10 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                 mAdapter.addItemAtBeginning(null);
                 break;
 
+            case NONE: // Current month + next and previous
+                // TODO: Consider adding here additional handling of such case
+                break;
+
             default:
                 throw new IllegalStateException("Unknown case found");
         }
@@ -245,6 +249,10 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                             // activity.mAdapter.addItemAtBeginning(CalendarUtils.getPreviousMonth(firstItemDate));
                             activity.mAdapter.addItemAtBeginning(CalendarDataFactory.newInstance().create(CalendarUtils.getPreviousMonth(firstItemDate.getCurrentMonth().getDay(0).getDate())));
                         }
+                        break;
+
+                    case NONE:
+                        // TODO: Consider adding here additional handling of such case
                         break;
 
                     default:

@@ -2,7 +2,6 @@ package com.verint.actionablecalendar.calendar;
 
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
-import android.widget.ImageView;
 
 import com.verint.actionablecalendar.calendar.models.AuctionBid;
 import com.verint.actionablecalendar.calendar.models.Bid;
@@ -83,5 +82,21 @@ public class Day {
 
     public void setShiftEnabled(boolean shiftEnabled){
         mShiftEnabled = shiftEnabled;
+    }
+
+    public AuctionBid getAuctionBid(){
+        return mAuctionBid;
+    }
+
+    public void setAuctionBid(final AuctionBid auctionBid){
+        mAuctionBid = auctionBid;
+    }
+
+    public Bid getBid(){
+        return mBid;
+    }
+
+    public void setBid(final Bid bid){
+        mBid = bid;
     }
 }

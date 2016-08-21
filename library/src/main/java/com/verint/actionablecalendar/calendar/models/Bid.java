@@ -1,5 +1,7 @@
 package com.verint.actionablecalendar.calendar.models;
 
+import android.support.annotation.DrawableRes;
+
 /**
  * TODO: Add to JavaDoc
  *
@@ -7,18 +9,18 @@ package com.verint.actionablecalendar.calendar.models;
  */
 public class Bid {
 
-    private String mBidImage;
+    private int mBidImage;
 
-    public Bid(String bidImage) {
+    public Bid(@DrawableRes final int bidImage) {
         mBidImage = bidImage;
     }
 
-
-    public String getBidImage() {
+    @DrawableRes
+    public int getBidImage() {
         return mBidImage;
     }
 
-    public void setBidImage(String bidImage) {
+    public void setBidImage(@DrawableRes int bidImage) {
         mBidImage = bidImage;
     }
 }

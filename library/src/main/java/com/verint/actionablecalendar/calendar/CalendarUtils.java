@@ -1,8 +1,6 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.support.annotation.NonNull;
-import android.text.format.DateUtils;
-import android.text.format.Time;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -142,9 +140,32 @@ public class CalendarUtils {
 
         Calendar calendar = (Calendar) CALENDAR.clone();
         calendar.setTime(dayDate);
+
         // Remove one day
         calendar.add(Calendar.DATE, -1);
         return calendar.getTime();
+    }
+
+    /**
+     * Calculates date of 1 day of next month and returns it
+     *
+     * @param month {@link MixedVisibleMonth}
+     * @return {@link Date}
+     */
+    public static Date getNextMonth(@NonNull MixedVisibleMonth month){
+
+        return getNextMonth(month.getCurrentMonth().getDay(0).getDate());
+    }
+
+    /**
+     * Calculates date of 1 day of previous month and returns it
+     *
+     * @param month {@link MixedVisibleMonth}
+     * @return {@link Date}
+     */
+    public static Date getPreviousMonth(@NonNull MixedVisibleMonth month){
+
+        return getPreviousMonth(month.getCurrentMonth().getDay(0).getDate());
     }
 
     public static Date getNextMonth(@NonNull final Date dayDate){

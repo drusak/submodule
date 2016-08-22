@@ -78,6 +78,7 @@ public class CalendarDataFactory {
         return nextMonthDayArray;
     }
 
+    // TODO: Implement here week end day processing according to utilized Locale
     private static boolean isWeekEndDay(@NonNull final Calendar calendar){
         final int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
         return dayOfWeek == Calendar.FRIDAY || dayOfWeek == Calendar.SATURDAY;

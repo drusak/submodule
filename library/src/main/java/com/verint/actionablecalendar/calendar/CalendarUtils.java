@@ -292,4 +292,80 @@ public class CalendarUtils {
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
         return String.format(Locale.getDefault(), "%d/%d/%d", day, month, year);
     }
+
+    /**
+     * Adjusts origin calendar to same but day time is set to one second AFTER midnight
+     *
+     * @param originCalendar {@link Calendar} that should be converted
+     * @return {@link Calendar} as result of conversion
+     */
+    @NonNull
+    public static Calendar getCalendarBeginOfDay(@NonNull Calendar originCalendar){
+
+        final Calendar  calendar = (Calendar) originCalendar.clone();
+
+        calendar.set(Calendar.HOUR_OF_DAY,0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar;
+    }
+
+    /**
+     * Adjusts origin calendar to same but day time is set to one second BEFORE midnight
+     *
+     * @param originCalendar {@link Calendar} that should be converted
+     * @return {@link Calendar} as result of conversion
+     */
+    @NonNull
+    public static Calendar getCalendarEndOfDay(Calendar originCalendar){
+
+        final Calendar  calendar = (Calendar) originCalendar.clone();
+
+        calendar.set(Calendar.HOUR_OF_DAY,23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+
+        return calendar;
+    }
+
+    /**
+     * Adjusts origin date to same but day time is set to one second AFTER midnight
+     *
+     * @param date {@link Date} that should be converted
+     * @return {@link Date} as result of conversion
+     */
+    public static Date getDateBeginOfDay(@NonNull Date date){
+
+        final Calendar  calendar = (Calendar) CALENDAR.clone();
+        calendar.setTime(date);
+
+        calendar.set(Calendar.HOUR_OF_DAY,0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
+    }
+
+    /**
+     * Adjusts origin date to same but day time is set to one second BEFORE midnight
+     *
+     * @param date {@link Date} that should be converted
+     * @return {@link Date} as result of conversion
+     */
+    public static Date getDateEndOfDay(Date date){
+
+        final Calendar  calendar = (Calendar) CALENDAR.clone();
+        calendar.setTime(date);
+
+        calendar.set(Calendar.HOUR_OF_DAY,23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+
+        return calendar.getTime();
+    }
 }

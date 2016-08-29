@@ -15,10 +15,13 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:maxLines="1"
+        android:gravity="left"
         android:background="@drawable/calendar_item_date_title_background"
         android:textColor="@color/calendar_item_date_title_text_color"
         android:paddingLeft="@dimen/calendar_item_date_title_padding_side"
         android:paddingStart="@dimen/calendar_item_date_title_padding_side"
+        android:paddingRight="@dimen/calendar_item_date_title_padding_side"
+        android:paddingEnd="@dimen/calendar_item_date_title_padding_side"
         android:paddingTop="@dimen/calendar_item_date_title_padding_top_bottom"
         android:paddingBottom="@dimen/calendar_item_date_title_padding_top_bottom"
         android:text="@string/test_calendar_header_text"/>

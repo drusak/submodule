@@ -2,10 +2,13 @@ package com.verint.actionablecalendar.calendar;
 
 import android.support.annotation.NonNull;
 
+import com.verint.actionablecalendar.utils.WeekendHelper;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Generates data (days) that should be shown within Month grid view for single month
@@ -78,10 +81,24 @@ public class CalendarDataFactory {
         return nextMonthDayArray;
     }
 
-    // TODO: Implement here week end day processing according to utilized Locale
+    /**
+     * Checks if provided day as an {@link Calendar} instance is weekend day in a country
+     * for currently used {@link Locale}. Returns true if day is weekend, false otherwise
+     * 
+     * @param calendar {@link Calendar}
+     * @return true|false
+     */
     private static boolean isWeekEndDay(@NonNull final Calendar calendar){
-        final int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        return dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY;
+        
+        final int calendarWeekDay = calendar.get(Calendar.DAY_OF_WEEK);
+
+        // Iterate over all week end days for currently used Locale and check if day is weekend day
+        for (int each : WeekendHelper.getWeekendDays(Locale.getDefault())){
+            if (each == calendarWeekDay){
+                return true;
+            }
+        }
+        return false;
     }
 
     @NonNull

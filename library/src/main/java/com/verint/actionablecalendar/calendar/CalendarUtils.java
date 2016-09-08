@@ -36,6 +36,22 @@ public class CalendarUtils {
         return result;
     }
 
+    /**
+     * Checks if provided calendar is set to today time and returns result accordingly. True
+     * if it represents today, false otherwise
+     * (Please note: hours are not taken in account)
+     *
+     * @param calendar instance of {@link Calendar}
+     * @return true|false
+     */
+    public static boolean isToday(Calendar calendar){
+
+        final Calendar todayCalendar = getCalendarForToday();
+        return todayCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
+                todayCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
+                todayCalendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
     private static String upperCaseWords(@NonNull String line) {
 
         line = line.trim().toLowerCase();

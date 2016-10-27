@@ -293,9 +293,6 @@ public class CalendarUtils {
             // FYI: 0-based
             final int month = calendarStart.get(Calendar.MONTH);
             final int day = calendarStart.get(Calendar.DAY_OF_MONTH);
-
-            // TODO: Delete after tests
-            Log.i(TAG, getHumanFriendlyCalendarRepresentation(calendarStart));
         }
 
         return dateList;

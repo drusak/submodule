@@ -8,6 +8,7 @@ import com.verint.actionablecalendar.calendar.models.Bid;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Data for single day item which will be represented as grid item of {@link CalendarWidget}
@@ -23,8 +24,13 @@ public class Day {
 
     // TODO: Reimplement to production data when will be ready
     private boolean mShiftEnabled;
-    private AuctionBid mAuctionBid;
-    private Bid mBid;
+
+    // view for time off icon and badge
+    private AuctionBid mTimeOffItem;
+    // view for auction with bids icon and badge
+    private AuctionBid mAuctionWithBidItem;
+    // view for auction without bids icon and badge
+    private AuctionBid mAuctionNoBidItem;
 
     public Day(final Date date, @NonNull DayState dayState){
 
@@ -84,19 +90,27 @@ public class Day {
         mShiftEnabled = shiftEnabled;
     }
 
-    public AuctionBid getAuctionBid(){
-        return mAuctionBid;
+    public AuctionBid getTimeOffItem() {
+        return mTimeOffItem;
     }
 
-    public void setAuctionBid(final AuctionBid auctionBid){
-        mAuctionBid = auctionBid;
+    public void setTimeOffItem(AuctionBid timeOffItem) {
+        mTimeOffItem = timeOffItem;
     }
 
-    public Bid getBid(){
-        return mBid;
+    public AuctionBid getAuctionWithBidItem() {
+        return mAuctionWithBidItem;
     }
 
-    public void setBid(final Bid bid){
-        mBid = bid;
+    public void setAuctionWithBidItem(AuctionBid auctionWithBidItem) {
+        mAuctionWithBidItem = auctionWithBidItem;
+    }
+
+    public AuctionBid getAuctionNoBidItem() {
+        return mAuctionNoBidItem;
+    }
+
+    public void setAuctionNoBidItem(AuctionBid auctionNoBidItem) {
+        mAuctionNoBidItem = auctionNoBidItem;
     }
 }

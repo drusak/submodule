@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <!-- Month day -->
 
@@ -28,10 +27,10 @@
         android:layout_height="@dimen/calendar_item_shift_indicator_height"
         android:background="@drawable/shift_indicator_background"/>
 
-    <!-- Action (optional Bid as well) view -->
+    <!-- TODO: Add here additional widgets -->
 
     <com.verint.actionablecalendar.calendar.AuctionBidView
-        android:id="@+id/abvCalendarAuctionBidView"
+        android:id="@+id/abvCalendarDayIconFirstLevelView"
         android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
         android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
         android:layout_centerHorizontal="true"
@@ -40,17 +39,13 @@
         app:showBadge="true"
         app:imageSrc="@drawable/ic_toof_req_my"/>
 
-    <!-- Bid view (Simple ImageView) -->
-
-    <ImageView
-        android:contentDescription="@null"
-        android:id="@+id/ivCalendarBidView"
-        android:layout_width="@dimen/calendar_item_bid_view_image_size"
-        android:layout_height="@dimen/calendar_item_bid_view_image_size"
-        android:layout_margin="2dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_shift_swp_reg"
-        android:layout_marginBottom="@dimen/calendar_item_view_margin_bottom"
-        android:adjustViewBounds="true"/>
+    <com.verint.actionablecalendar.calendar.AuctionBidView
+        android:id="@+id/abvCalendarDayIconSecondLevelView"
+        android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
+        android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
+        android:layout_width="@dimen/calendar_item_event_view_image_size"
+        android:layout_height="@dimen/calendar_item_event_view_image_size"
+        app:showBadge="true"
+        app:imageSrc="@drawable/ic_toof_req_my"/>
 
 </LinearLayout>

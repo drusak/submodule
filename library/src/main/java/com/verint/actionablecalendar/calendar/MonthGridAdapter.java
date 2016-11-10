@@ -115,16 +115,16 @@ public class MonthGridAdapter extends BaseAdapter {
         protected View mRootView;
         protected TextView mMonthDay;
         protected View mShiftIndicator;
-        protected AuctionBidView mAuctionBidView;
-        protected ImageView mBidView;
+        protected AuctionBidView mDayIconFirstLevelView;
+        protected AuctionBidView mDayIconSecondLevelView;
 
         protected MonthGridViewHolder(@NonNull final View view){
 
             mRootView = view;
             mMonthDay = (TextView) view.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = view.findViewById(R.id.vMonthGridItemShiftIndicator);
-            mAuctionBidView = (AuctionBidView) view.findViewById(R.id.abvCalendarAuctionBidView);
-            mBidView = (ImageView) view.findViewById(R.id.ivCalendarBidView);
+            mDayIconFirstLevelView = (AuctionBidView) view.findViewById(R.id.abvCalendarDayIconFirstLevelView);
+            mDayIconSecondLevelView = (AuctionBidView) view.findViewById(R.id.abvCalendarDayIconSecondLevelView);
         }
 
         protected void bind(@NonNull final Day day, final int position,
@@ -136,20 +136,8 @@ public class MonthGridAdapter extends BaseAdapter {
 
                     mMonthDay.setVisibility(View.VISIBLE);
                     mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
-                    mBidView.setVisibility(View.VISIBLE);
-                    mAuctionBidView.setVisibility(View.VISIBLE);
 
-                    // TODO: Implement later real binding of auction and bid and badge images
-                    if (day.getBid() == null){
-                        mBidView.setImageResource(0);
-                    }
-                    if (day.getAuctionBid() == null){
-                        mAuctionBidView.setImage(0);
-                        mAuctionBidView.setBadge(0);
-                    }
-                    // mBidView.setImageResource(day.getBid().getBidImage());
-                    // mAuctionBidView.setImage(day.getAuctionBid().getAuctionImage());
-                    // mAuctionBidView.setBadge(day.getAuctionBid().getBadgeImage());
+                    setVisibilityForLevelIcon(day);
 
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
 
@@ -189,20 +177,8 @@ public class MonthGridAdapter extends BaseAdapter {
 
                     mMonthDay.setVisibility(View.VISIBLE);
                     mShiftIndicator.setVisibility(day.isShiftEnabled() ? View.VISIBLE : View.INVISIBLE);
-                    mBidView.setVisibility(View.VISIBLE);
-                    mAuctionBidView.setVisibility(View.VISIBLE);
 
-                    // TODO: Implement later real binding of auction and bid and badge images
-                    if (day.getBid() == null){
-                        mBidView.setImageResource(0);
-                    }
-                    if (day.getAuctionBid() == null){
-                        mAuctionBidView.setImage(0);
-                        mAuctionBidView.setBadge(0);
-                    }
-                    // mBidView.setImageResource(day.getBid().getBidImage());
-                    // mAuctionBidView.setImage(day.getAuctionBid().getAuctionImage());
-                    // mAuctionBidView.setBadge(day.getAuctionBid().getBadgeImage());
+                    setVisibilityForLevelIcon(day);
 
                     // Change day value text color
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
@@ -242,8 +218,8 @@ public class MonthGridAdapter extends BaseAdapter {
 
                     mMonthDay.setVisibility(View.INVISIBLE);
                     mShiftIndicator.setVisibility(View.INVISIBLE);
-                    mBidView.setVisibility(View.INVISIBLE);
-                    mAuctionBidView.setVisibility(View.INVISIBLE);
+                    mDayIconFirstLevelView.setVisibility(View.INVISIBLE);
+                    mDayIconSecondLevelView.setVisibility(View.INVISIBLE);
 
                     mRootView.setBackgroundColor(Color.WHITE);
 
@@ -257,5 +233,41 @@ public class MonthGridAdapter extends BaseAdapter {
                             + DayState.DayType.class.getSimpleName() + " case found");
             }
         }
+
+        /**
+         * hide, show icons and badges for levels depending on day
+         */
+        private void setVisibilityForLevelIcon(Day day) {
+
+            if (day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null) {
+                mDayIconFirstLevelView.setVisibility(View.VISIBLE);
+                if (day.getTimeOffItem() != null) {
+                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getAuctionImage());
+                    mDayIconFirstLevelView.setBadge(day.getTimeOffItem().getBadgeImage());
+                } else {
+                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getAuctionImage());
+                    mDayIconFirstLevelView.setBadge(day.getAuctionWithBidItem().getBadgeImage());
+                }
+
+                if (day.getAuctionNoBidItem() != null) {
+                    mDayIconSecondLevelView.setVisibility(View.VISIBLE);
+                    mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
+                    mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
+                } else {
+                    mDayIconSecondLevelView.setVisibility(View.INVISIBLE);
+                }
+            } else {
+                if (day.getAuctionNoBidItem() != null) {
+                    mDayIconFirstLevelView.setVisibility(View.VISIBLE);
+                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
+                    mDayIconFirstLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
+                } else {
+                    mDayIconFirstLevelView.setVisibility(View.INVISIBLE);
+                }
+                mDayIconSecondLevelView.setVisibility(View.INVISIBLE);
+            }
+
+        }
     }
+
 }

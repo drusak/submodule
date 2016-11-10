@@ -3,6 +3,7 @@ package com.verint.actionablecalendar.calendar;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -74,11 +75,11 @@ public class AuctionBidView extends FrameLayout {
         mEventBadge.setVisibility(showBadge ? View.VISIBLE : View.INVISIBLE);
     }
 
-    public void setImage(int imageId){
+    public void setImage(@DrawableRes int imageId){
         mEventImage.setImageResource(imageId);
     }
 
-    public void setBadge(int badgeId){
+    public void setBadge(@DrawableRes int badgeId){
         mEventBadge.setImageResource(badgeId);
     }
 }

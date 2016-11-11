@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/calendar_item_min_height">
 
     <!-- Month day -->
 
@@ -15,7 +16,7 @@
         android:gravity="center_horizontal"
         android:singleLine="true"
         android:maxLines="1"
-
+        android:textSize="@dimen/calendar_item_text_size"
         android:text="29"/>
 
     <!-- Shift indicator -->
@@ -41,8 +42,6 @@
 
     <com.verint.actionablecalendar.calendar.AuctionBidView
         android:id="@+id/abvCalendarDayIconSecondLevelView"
-        android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
-        android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
         android:layout_width="@dimen/calendar_item_event_view_image_size"
         android:layout_height="@dimen/calendar_item_event_view_image_size"
         app:showBadge="true"

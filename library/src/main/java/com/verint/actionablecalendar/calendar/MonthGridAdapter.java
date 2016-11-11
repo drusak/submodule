@@ -218,8 +218,8 @@ public class MonthGridAdapter extends BaseAdapter {
 
                     mMonthDay.setVisibility(View.INVISIBLE);
                     mShiftIndicator.setVisibility(View.INVISIBLE);
-                    mDayIconFirstLevelView.setVisibility(View.INVISIBLE);
-                    mDayIconSecondLevelView.setVisibility(View.INVISIBLE);
+                    mDayIconFirstLevelView.setVisibility(View.GONE);
+                    mDayIconSecondLevelView.setVisibility(View.GONE);
 
                     mRootView.setBackgroundColor(Color.WHITE);
 
@@ -254,7 +254,7 @@ public class MonthGridAdapter extends BaseAdapter {
                     mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
                     mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                 } else {
-                    mDayIconSecondLevelView.setVisibility(View.INVISIBLE);
+                    mDayIconSecondLevelView.setVisibility(View.GONE);
                 }
             } else {
                 if (day.getAuctionNoBidItem() != null) {
@@ -262,9 +262,9 @@ public class MonthGridAdapter extends BaseAdapter {
                     mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
                     mDayIconFirstLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                 } else {
-                    mDayIconFirstLevelView.setVisibility(View.INVISIBLE);
+                    mDayIconFirstLevelView.setVisibility(View.GONE);
                 }
-                mDayIconSecondLevelView.setVisibility(View.INVISIBLE);
+                mDayIconSecondLevelView.setVisibility(View.GONE);
             }
 
         }

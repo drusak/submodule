@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/calendar_item_min_height">
+    android:layout_height="@dimen/calendar_item_min_height">
 
     <!-- Month day -->
 
@@ -23,28 +24,32 @@
 
     <View
         android:id="@+id/vMonthGridItemShiftIndicator"
-        android:layout_centerHorizontal="true"
         android:layout_width="@dimen/calendar_item_shift_indicator_width"
         android:layout_height="@dimen/calendar_item_shift_indicator_height"
         android:background="@drawable/shift_indicator_background"/>
 
-    <!-- TODO: Add here additional widgets -->
+    <!-- request indicator -->
 
     <com.verint.actionablecalendar.calendar.AuctionBidView
         android:id="@+id/abvCalendarDayIconFirstLevelView"
         android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
         android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
-        android:layout_centerHorizontal="true"
         android:layout_width="@dimen/calendar_item_event_view_image_size"
         android:layout_height="@dimen/calendar_item_event_view_image_size"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:showBadge="true"
-        app:imageSrc="@drawable/ic_toof_req_my"/>
+        tools:imageSrc="@drawable/ic_toof_req_my"/>
+
+    <!-- auction indicator -->
 
     <com.verint.actionablecalendar.calendar.AuctionBidView
         android:id="@+id/abvCalendarDayIconSecondLevelView"
         android:layout_width="@dimen/calendar_item_event_view_image_size"
         android:layout_height="@dimen/calendar_item_event_view_image_size"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:showBadge="true"
-        app:imageSrc="@drawable/ic_toof_req_my"/>
+        tools:imageSrc="@drawable/ic_toof_req_my"/>
 
 </LinearLayout>

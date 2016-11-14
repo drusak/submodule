@@ -68,6 +68,7 @@ public class CalendarWidget extends LinearLayout {
         // Inflate provided layout
         final View view
                 = LayoutInflater.from(getContext()).inflate(R.layout.calendar_widget, this, true);
+        setOrientation(VERTICAL);
         // Set bridges from XML to java part
         mDateTitle = (TextView) view.findViewById(R.id.tvCalendarWidgetDateTitle);
         mGridView = (HeightWrapGridView) view.findViewById(R.id.hwgvCalendarWidgetContent);

@@ -117,4 +117,22 @@ public class MixedVisibleMonth {
 
         return dayList;
     }
+
+    public List<Day> getDayListWithHeaders(){
+
+        final List<Day> dayList = new ArrayList<>();
+
+        dayList.addAll(mPreviousMonth.getDayList());
+
+        if (mCurrentMonth.size() > 0) {
+            Day firstDay = mCurrentMonth.getDay(0);
+            Day monthHeader = new Day(firstDay.getDate(), new DayState(DayState.DayType.MONTH_HEADER));
+            dayList.add(0, monthHeader);
+            dayList.addAll(mCurrentMonth.getDayList());
+        }
+
+        dayList.addAll(mNextMonth.getDayList());
+
+        return dayList;
+    }
 }

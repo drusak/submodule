@@ -13,10 +13,10 @@ import com.verint.actionablecalendar.calendar.CalendarCallbacks;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.CalendarWidget;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
+import com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener;
+import com.verint.actionablecalendar.calendar.listener.OnMonthListScrollListener;
 import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.library.R;
-import com.verint.library.listeners.OnLoadMoreListener;
-import com.verint.library.listeners.OnMonthListScrollListener;
 
 import java.util.Calendar;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.verint.library.listeners;
+package com.verint.actionablecalendar.calendar.listener;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;

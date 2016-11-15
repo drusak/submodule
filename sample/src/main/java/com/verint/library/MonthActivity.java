@@ -1,15 +1,16 @@
 package com.verint.library;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
 import com.verint.actionablecalendar.calendar.CalendarDataFactory;
+import com.verint.actionablecalendar.calendar.CalendarRecyclerView;
 import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.Day;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
@@ -18,8 +19,6 @@ import com.verint.actionablecalendar.weekday.WeekDayBuilder;
 import com.verint.actionablecalendar.weekday.WeekDayDataFactory;
 import com.verint.actionablecalendar.weekday.WeekDayWidget;
 import com.verint.library.adapters.MonthListAdapter;
-import com.verint.library.listeners.OnListScrollDirectionalListener;
-import com.verint.library.listeners.OnLoadMoreListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -34,13 +33,13 @@ import static com.verint.library.adapters.MonthListAdapter.VISIBLE_THRESHOLD;
  * according to predefined date range
  */
 public class MonthActivity extends AppCompatActivity implements CalendarCallbacks,
-        OnLoadMoreListener{
+        com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener{
 
     // Title of week days above list of {@link CalendarWidget}
     private WeekDayWidget mWeekDayWidget;
 
     // Calendar related fields
-    private RecyclerView mRecyclerView;
+    private CalendarRecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private MonthListAdapter mAdapter;
     private List<MixedVisibleMonth> mMonthList;
@@ -52,7 +51,10 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        init();
+//        init();
+        mRecyclerView = (CalendarRecyclerView) findViewById(R.id.rvMainActivityMonthList);
+        mRecyclerView.setCalendarItemClickListener(this);
+//        mRecyclerView.setOnLoadMoreListener(MonthActivity.this);
         initWeekDayNames();
     }
 
@@ -70,48 +72,48 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(MonthActivity.this, "Changing current month shifts", Toast.LENGTH_SHORT).show();
-        // super.onBackPressed();
-        performTestUpdate(new Date(System.currentTimeMillis()));
+//        Toast.makeText(MonthActivity.this, "Changing current month shifts", Toast.LENGTH_SHORT).show();
+         super.onBackPressed();
+//        performTestUpdate(new Date(System.currentTimeMillis()));
     }
 
     private void init() {
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rvMainActivityMonthList);
+//        mRecyclerView = (RecyclerView) findViewById(R.id.rvMainActivityMonthList);
 
-        Date currentMonth = new Date(System.currentTimeMillis());
-        initMonthListForDate(currentMonth);
-
-        mLayoutManager = new LinearLayoutManager(getApplicationContext(),
-                LinearLayoutManager.VERTICAL, false);
-        // TODO: Consider passing {@link RecyclerView} and adding listener inside of adapter
-        mAdapter = new MonthListAdapter(mMonthList, MonthActivity.this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(mAdapter);
-
-        // Provide listener for load more flow
-        mAdapter.setOnLoadMoreListener(MonthActivity.this);
-
-        // Specify listener for scroll events in order to differentiate scroll direction
-        mRecyclerView.addOnScrollListener(new OnListScrollDirectionalListener(mRecyclerView) {
-
-            @Override
-            public void onScrolledUp(RecyclerView recyclerView, int dx, int dy) {
-
-                if (mAdapter != null){
-                    mAdapter.onMonthListScroll(mLayoutManager, Direction.UP);
-                }
-            }
-
-            @Override
-            public void onScrolledDown(RecyclerView recyclerView, int dx, int dy) {
-
-                if (mAdapter != null){
-                    mAdapter.onMonthListScroll(mLayoutManager, Direction.DOWN);
-                }
-            }
-        });
+//        Date currentMonth = new Date(System.currentTimeMillis());
+//        initMonthListForDate(currentMonth);
+//
+//        mLayoutManager = new LinearLayoutManager(getApplicationContext(),
+//                LinearLayoutManager.VERTICAL, false);
+//        // TODO: Consider passing {@link RecyclerView} and adding listener inside of adapter
+//        mAdapter = new MonthListAdapter(mMonthList, MonthActivity.this);
+//        mRecyclerView.setLayoutManager(mLayoutManager);
+//        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setAdapter(mAdapter);
+//
+//        // Provide listener for load more flow
+//        mAdapter.setOnLoadMoreListener(MonthActivity.this);
+//
+//        // Specify listener for scroll events in order to differentiate scroll direction
+//        mRecyclerView.addOnScrollListener(new OnListScrollDirectionalListener(mRecyclerView) {
+//
+//            @Override
+//            public void onScrolledUp(RecyclerView recyclerView, int dx, int dy) {
+//
+//                if (mAdapter != null){
+//                    mAdapter.onMonthListScroll(mLayoutManager, Direction.UP);
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolledDown(RecyclerView recyclerView, int dx, int dy) {
+//
+//                if (mAdapter != null){
+//                    mAdapter.onMonthListScroll(mLayoutManager, Direction.DOWN);
+//                }
+//            }
+//        });
 
         // Scroll to current month if such month exists within currently set data list
         final int currentMonthPosition = mAdapter.getCurrentMonthPosition();
@@ -223,7 +225,7 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                     case DOWN:  // Load future dates
 
                         // Remove loading item
-                        activity.mAdapter.removeLastItem();
+//                        activity.mAdapter.removeLastItem();
 
                         // Load more
                         int listCount = activity.mMonthList.size();
@@ -240,7 +242,7 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                     case UP: // Load past dates
 
                         // Remove loading item
-                        activity.mAdapter.removeFirstItem();
+//                        activity.mAdapter.removeFirstItem();
 
                         // Load more
                         for (int i=0; i < VISIBLE_THRESHOLD; i++){

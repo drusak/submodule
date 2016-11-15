@@ -1,4 +1,4 @@
-package com.verint.library.listeners;
+package com.verint.actionablecalendar.calendar.listener;
 
 import com.verint.actionablecalendar.calendar.models.Direction;
 

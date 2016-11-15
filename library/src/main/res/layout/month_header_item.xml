@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvCalendarWidgetDateTitle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:singleLine="true"
+    android:maxLines="1"
+    android:gravity="left"
+    android:background="@drawable/calendar_item_date_title_background"
+    android:textColor="@color/calendar_item_date_title_text_color"
+    android:paddingLeft="@dimen/calendar_item_date_title_padding_side"
+    android:paddingStart="@dimen/calendar_item_date_title_padding_side"
+    android:paddingRight="@dimen/calendar_item_date_title_padding_side"
+    android:paddingEnd="@dimen/calendar_item_date_title_padding_side"
+    android:paddingTop="@dimen/calendar_item_date_title_padding_top_bottom"
+    android:paddingBottom="@dimen/calendar_item_date_title_padding_top_bottom"
+    tools:text="@string/test_calendar_header_text"/>

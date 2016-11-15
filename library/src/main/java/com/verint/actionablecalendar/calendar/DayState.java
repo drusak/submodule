@@ -15,7 +15,8 @@ public class DayState {
     public enum DayType {
         CURRENT_MONTH_DAY_NORMAL,
         CURRENT_MONTH_DAY_WEEKEND,
-        NON_CURRENT_MONTH_DAY
+        NON_CURRENT_MONTH_DAY,
+        MONTH_HEADER
     }
 
     private DayType mType;

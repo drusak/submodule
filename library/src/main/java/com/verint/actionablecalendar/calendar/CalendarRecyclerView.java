@@ -29,6 +29,7 @@ import static com.verint.actionablecalendar.calendar.models.Direction.UP;
 public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreListener {
 
     CalendarRecyclerViewAdapter mAdapter;
+    private OnNewMonthsAddedListener mOnNewMonthsAddedListener;
 
     public CalendarRecyclerView(Context context) {
         super(context);
@@ -46,9 +47,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     }
 
     private void init() {
-        Date currentMonth = new Date(System.currentTimeMillis());
-        List<MixedVisibleMonth> monthList = initMonthListForDate(currentMonth);
-
         GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(), 7,
                 LinearLayoutManager.VERTICAL, false);
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -57,7 +55,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
                 return getAdapter().getItemViewType(position) == CalendarRecyclerViewAdapter.VIEW_TYPE_MONTH_HEADER ? 7 : 1;
             }
         });
-        mAdapter = new CalendarRecyclerViewAdapter(monthList);
+        mAdapter = new CalendarRecyclerViewAdapter(new ArrayList<MixedVisibleMonth>());
         setLayoutManager(mLayoutManager);
         setHasFixedSize(true);
         setAdapter(mAdapter);
@@ -90,8 +88,30 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         scrollToPosition(mAdapter.getItemCount() / 2);
     }
 
+    public void initFirstLoading() {
+        Date currentMonth = new Date(System.currentTimeMillis());
+        List<MixedVisibleMonth> monthList = initMonthListForDate(currentMonth);
+        setData(monthList);
+    }
+
+    public void setData(List<MixedVisibleMonth> months) {
+        mAdapter.setMonths(months);
+        if (mOnNewMonthsAddedListener != null) {
+            mOnNewMonthsAddedListener.onNewMonthsAdded(months);
+        }
+
+    }
+
     public void setCalendarItemClickListener(@NonNull CalendarCallbacks calendarItemClickListener) {
         mAdapter.setItemClickListener(calendarItemClickListener);
+    }
+
+    public void setOnNewMonthsAddedListener(OnNewMonthsAddedListener onNewMonthsAddedListener) {
+        mOnNewMonthsAddedListener = onNewMonthsAddedListener;
+    }
+
+    public void updateMonths(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
+        mAdapter.updateItems(monthList, shift, timeOff, auction);
     }
 
     @Override
@@ -109,12 +129,26 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
                 // Load more
                 int listCount = mAdapter.getMonths().size();
                 int newListCount = listCount + 3;
-
+                List<MixedVisibleMonth> newMonths = new ArrayList<>(3);
                 for (int i=listCount; i < newListCount; i++){
                     // Get current last item
-                    final MixedVisibleMonth lastItemDate = mAdapter.getMonths().get(i-1);
-                    // activity.mAdapter.addItemAtTheEnd(CalendarUtils.getNextMonth(lastItemDate));
-                    mAdapter.addItemAtTheEnd(CalendarDataFactory.newInstance().create(CalendarUtils.getNextMonth(lastItemDate.getCurrentMonth().getDay(0).getDate())));
+                    MixedVisibleMonth lastItemDate;
+
+                    if (mAdapter.getMonths().size() == 0){
+                        // We take not item size-1 since it is null
+                        lastItemDate = mAdapter.getMonths().get(mAdapter.getMonths().size()-2);
+                    } else {
+                        lastItemDate = mAdapter.getMonths().get(mAdapter.getMonths().size()-1);
+                    }
+
+                    final MixedVisibleMonth nextMonth = CalendarDataFactory.newInstance()
+                            .create(CalendarUtils.getNextMonth(lastItemDate));
+
+                    mAdapter.addItemAtTheEnd(nextMonth);
+                    newMonths.add(lastItemDate);
+                }
+                if (mOnNewMonthsAddedListener != null) {
+                    mOnNewMonthsAddedListener.onNewMonthsAdded(newMonths);
                 }
                 break;
 
@@ -122,13 +156,18 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
                 // Remove loading item
 //                        activity.mAdapter.removeFirstItem();
-
+                newMonths = new ArrayList<>(3);
                 // Load more
                 for (int i=0; i < 3; i++){
                     // Get current first item
                     final MixedVisibleMonth firstItemDate = mAdapter.getMonths().get(0);
                     // activity.mAdapter.addItemAtBeginning(CalendarUtils.getPreviousMonth(firstItemDate));
                     mAdapter.addItemAtBeginning(CalendarDataFactory.newInstance().create(CalendarUtils.getPreviousMonth(firstItemDate.getCurrentMonth().getDay(0).getDate())));
+                    newMonths.add(firstItemDate);
+                }
+
+                if (mOnNewMonthsAddedListener != null) {
+                    mOnNewMonthsAddedListener.onNewMonthsAdded(newMonths);
                 }
                 break;
 
@@ -156,5 +195,8 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         return monthList;
     }
 
+    public interface OnNewMonthsAddedListener {
+        void onNewMonthsAdded(List<MixedVisibleMonth> newMonths);
+    }
 
 }

@@ -116,6 +116,62 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         mItemClickListener = itemClickListener;
     }
 
+    public void clear() {
+        int size = mDays.size();
+        mDays.clear();
+        mMonths.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
+    public void setMonths(List<MixedVisibleMonth> months) {
+        clear();
+        mMonths.addAll(months);
+        for (MixedVisibleMonth month : months) {
+            mDays.addAll(month.getDayListWithHeaders());
+        }
+        notifyItemRangeInserted(0, mDays.size());
+    }
+
+    public boolean updateItem(final MixedVisibleMonth month, boolean shift, boolean timeOff, boolean auction) {
+        if (month != null && month.getDayList().size() > 0) {
+            Day firstDay = month.getDay(0);
+            int index = mDays.indexOf(firstDay);
+            if (index >= 0) {
+                List<Day> newDays = month.getDayList();
+                // one by one update in case same date
+                for (int i = 0, size = newDays.size(); i < size; i++) {
+                    Day day = mDays.get(i + index);
+                    Day newDay = newDays.get(i);
+                    if (shift) {
+                        day.setShiftEnabled(newDay.isShiftEnabled());
+                    }
+                    if (timeOff) {
+                        day.setTimeOffItem(newDay.getTimeOffItem());
+                    }
+                    if (auction) {
+                        day.setAuctionNoBidItem(newDay.getAuctionNoBidItem());
+                        day.setAuctionWithBidItem(newDay.getAuctionWithBidItem());
+                    }
+                }
+                notifyItemRangeChanged(index, newDays.size());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean updateItems(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
+        boolean updated = false;
+        for (MixedVisibleMonth each : monthList) {
+            boolean oneItemUpdated = updateItem(each, shift, timeOff, auction);
+            if (!updated) {
+                updated = oneItemUpdated;
+            }
+        }
+
+        return updated;
+    }
+
     /**
      * Adds {@link MixedVisibleMonth} item to data list at position 0 and notifies adapter that item was
      * inserted

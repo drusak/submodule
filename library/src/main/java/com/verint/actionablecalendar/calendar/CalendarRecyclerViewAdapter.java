@@ -1,13 +1,9 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.graphics.Color;
-import android.graphics.Point;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +16,6 @@ import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.mylibrary.R;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -41,14 +35,11 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     private OnLoadMoreListener mOnLoadMoreListener;
     private CalendarCallbacks mItemClickListener;
-    private VisualCommunicatorCallback mVisualCommunicatorCallback;
-    private Handler mUiHandler;
 
 
     private boolean mLoadingInProgress;
 
     public CalendarRecyclerViewAdapter(@NonNull List<MixedVisibleMonth> months) {
-        mUiHandler = new Handler(Looper.myLooper());
         mMonths = months;
         mDays = new ArrayList<>();
         for (MixedVisibleMonth month : months) {
@@ -105,10 +96,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
             case UP:
                 final int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
-                if (!mLoadingInProgress && (firstVisibleItemPosition - 30) <= 0){
+                if (!mLoadingInProgress && (firstVisibleItemPosition - 50) <= 0){
                     mLoadingInProgress = true;
                     if (mOnLoadMoreListener != null){
-                        addItemAtBeginning(null);
                         mOnLoadMoreListener.onLoadMore(scrollDirection);
                     }
                 }
@@ -118,10 +108,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 final int totalItemCount = linearLayoutManager.getItemCount();
                 final int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
 
-                if (!mLoadingInProgress && totalItemCount <= (lastVisibleItemPosition + 30)){
+                if (!mLoadingInProgress && totalItemCount <= (lastVisibleItemPosition + 50)){
                     mLoadingInProgress = true;
                     if (mOnLoadMoreListener != null){
-                        addItemAtTheEnd(null);
                         mOnLoadMoreListener.onLoadMore(scrollDirection);
                     }
                 }
@@ -140,10 +129,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         mItemClickListener = itemClickListener;
     }
 
-    public void setVisualCommunicatorCallback(VisualCommunicatorCallback visualCommunicatorCallback) {
-        mVisualCommunicatorCallback = visualCommunicatorCallback;
-    }
-
     public void clear() {
         int size = mDays.size();
         mDays.clear();
@@ -160,7 +145,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         notifyItemRangeInserted(0, mDays.size());
     }
 
-    private void removeAllItems(Day day) {
+    private void removeAllItemsEquals(Day day) {
         int index = -1;
         do {
             index = mDays.indexOf(day);
@@ -175,7 +160,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (month != null && month.getDayList().size() > 0) {
             Day firstDay = month.getDay(0);
             final int index = mDays.indexOf(firstDay);
-            boolean isTodayHere = false;
             if (index >= 0) {
                 List<Day> newDays = month.getDayList();
                 final int newDaysSize = newDays.size();
@@ -183,9 +167,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 for (int i = 0; i < newDaysSize; i++) {
                     Day day = mDays.get(i + index);
                     Day newDay = newDays.get(i);
-                    if (CalendarUtils.isToday(day)) {
-                        isTodayHere = true;
-                    }
                     if (shift) {
                         day.setShiftEnabled(newDay.isShiftEnabled());
                     }
@@ -197,27 +178,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         day.setAuctionWithBidItem(newDay.getAuctionWithBidItem());
                     }
                 }
-                startIndexes.add(index);
-                endIndexes.add(index + newDays.size());
-                if (isTodayHere) {
-                    mUiHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            notifyItemRangeChanged(index, newDaysSize);
-                        }
-                    });
-                }
-//                if (mVisualCommunicatorCallback != null) {
-//                    int first = mVisualCommunicatorCallback.getFirstVisibleItemPosition();
-//                    int last = mVisualCommunicatorCallback.getLastVisibleItemPosition();
-//                    int lastUpdatedIndex = index + newDays.size();
-//                    if ((first <= index && index < last) || (first <= lastUpdatedIndex && lastUpdatedIndex < last)) {
-//                        int startIndex = Math.max(first, index);
-//                        notifyItemRangeChanged(startIndex, Math.min(last, lastUpdatedIndex) - startIndex);
-//                    }
-//                } else {
-//                    notifyItemRangeChanged(index, newDays.size());
-//                }
                 return true;
             }
         }
@@ -234,30 +194,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         return updated;
-    }
-
-    public Point containsChangedIndexes(int start, int end) {
-        Iterator<Integer> startIterator = startIndexes.iterator();
-        Iterator<Integer> endIterator = endIndexes.iterator();
-        int maxStart = -1;
-        int minEnd = Integer.MAX_VALUE;
-        while (startIterator.hasNext() && endIterator.hasNext()) {
-            int startIndex = startIterator.next();
-            int endIndex = endIterator.next();
-            int s = Math.max(startIndex, start);
-            int e = Math.min(endIndex, end);
-            if (s < end && e > start) {
-                maxStart = Math.max(maxStart, s);
-                minEnd = Math.min(minEnd, e);
-            }
-        }
-        startIndexes.clear();
-        endIndexes.clear();
-        if (maxStart == -1) {
-            return null;
-        } else {
-            return new Point(maxStart, minEnd);
-        }
     }
 
     /**
@@ -329,15 +265,11 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public void setLoaded(){
         mLoadingInProgress = false;
-        removeAllItems(null);
     }
 
     public List<MixedVisibleMonth> getMonths() {
         return mMonths;
     }
-
-    LinkedHashSet<Integer> startIndexes = new LinkedHashSet<>();
-    LinkedHashSet<Integer> endIndexes = new LinkedHashSet<>();
 
     // --------------------------------------------------------------------------------------------
 
@@ -478,6 +410,18 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
          * hide, show icons and badges for levels depending on day
          */
         private void setVisibilityForLevelIcon(Day day) {
+
+            /*if (new Random().nextBoolean()) {
+                mDayIconFirstLevelView.setVisibility(View.VISIBLE);
+                mDayIconSecondLevelView.setVisibility(View.VISIBLE);
+
+                mDayIconFirstLevelView.setImage(R.drawable.ic_multi_shiftbid_my);
+                mDayIconFirstLevelView.setBadge(R.drawable.si_denied_sm);
+
+                mDayIconSecondLevelView.setImage(R.drawable.ic_shiftbid_my);
+                mDayIconSecondLevelView.setBadge(R.drawable.si_approve_sm);
+                return;
+            }*/
 
             if (day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null) {
                 mDayIconFirstLevelView.setVisibility(View.VISIBLE);

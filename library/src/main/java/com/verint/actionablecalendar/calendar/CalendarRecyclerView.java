@@ -1,8 +1,8 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -29,6 +29,8 @@ import static com.verint.actionablecalendar.calendar.models.Direction.UP;
  */
 
 public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreListener {
+
+    private static final int NUMBER_OF_MONTHS_TO_LOAD = 2;
 
     CalendarRecyclerViewAdapter mAdapter;
     private OnNewMonthsAddedListener mOnNewMonthsAddedListener;
@@ -67,17 +69,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         setAdapter(mAdapter);
 
         mAdapter.setOnLoadMoreListener(this);
-        mAdapter.setVisualCommunicatorCallback(new CalendarRecyclerViewAdapter.VisualCommunicatorCallback() {
-            @Override
-            public int getFirstVisibleItemPosition() {
-                return mLayoutManager.findFirstVisibleItemPosition();
-            }
-
-            @Override
-            public int getLastVisibleItemPosition() {
-                return mLayoutManager.findLastVisibleItemPosition();
-            }
-        });
 
         // Specify listener for scroll events in order to differentiate scroll direction
         addOnScrollListener(new OnListScrollDirectionalListener(this) {
@@ -97,23 +88,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             }
         });
 
-        addOnScrollListener(new OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == SCROLL_STATE_IDLE) {
-                    if (!mAdapter.isLoadingInProgress()) {
-                        updateVisibleItems();
-                    }
-                } else {
-                    mUiHandler.removeCallbacksAndMessages(null);
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
 
 //        // Scroll to current month if such month exists within currently set data list
 //        final int currentMonthPosition = mAdapter.getCurrentMonthPosition();
@@ -122,15 +96,20 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 //        }
     }
 
-    private void updateVisibleItems() {
+    private boolean updateVisibleItems() {
         final int first = mLayoutManager.findFirstVisibleItemPosition();
         final int last = mLayoutManager.findLastVisibleItemPosition();
         Log.i("!!!", "scroll notify changed " + first + "/" + (last - first));
-        Point adjustedChangedIndexes = mAdapter.containsChangedIndexes(first - 10, last + 10);
-        if (adjustedChangedIndexes != null) {
-            postUpdate(Math.max(0, adjustedChangedIndexes.x),
-                    Math.min(adjustedChangedIndexes.y, mAdapter.getItemCount()));
+        int minStart = 150;
+        int maxEnd = mAdapter.getItemCount() - 150;
+        if (first < minStart) {
+            postUpdate(first - 10, last + 10);
+            return true;
+        } else if (last > maxEnd) {
+            postUpdate(first - 10, last + 10);
+            return true;
         }
+        return false;
     }
 
     private void postUpdate(final int currentPosition, final int maxPosition) {
@@ -138,6 +117,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             @Override
             public void run() {
                 if (getScrollState() == SCROLL_STATE_IDLE && currentPosition <= maxPosition) {
+                    Log.i("!!!", "notify part " + currentPosition + "/" + (5));
                     mAdapter.notifyItemRangeChanged(currentPosition, 5);
                     postUpdate(currentPosition + 5, maxPosition);
                 } else {
@@ -173,17 +153,24 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
     public void updateMonths(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
         mAdapter.updateItems(monthList, shift, timeOff, auction);
+        mLoadingHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                updateVisibleItems();
+            }
+        });
+
     }
 
     @Override
     public void onLoadMore(final Direction scrollDirection) {
 
-        mLoadingHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        if (mAdapter.getMonths().size() == 0) {
+            return;
+        }
         // Add null accordingly to scroll direction in order to enable loading progress bar
         final List<MixedVisibleMonth> months;
-        switch (scrollDirection){
+        switch (scrollDirection) {
 
             case DOWN:  // Load future dates
 
@@ -191,22 +178,14 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 //                        activity.mAdapter.removeLastItem();
 
                 // Load more
-                months = new ArrayList<>(3);
+                months = new ArrayList<>(NUMBER_OF_MONTHS_TO_LOAD);
                 int listCount = mAdapter.getMonths().size();
-                int newListCount = listCount + 3;
-                for (int i=listCount; i < newListCount; i++){
+                for (int i = listCount, newListCount = listCount + NUMBER_OF_MONTHS_TO_LOAD; i < newListCount; i++) {
                     // Get current last item
-                    MixedVisibleMonth lastItemDate;
-
-                    if (mAdapter.getMonths().size() == 0){
-                        // We take not item size-1 since it is null
-                        lastItemDate = mAdapter.getMonths().get(mAdapter.getMonths().size()-2);
-                    } else {
-                        lastItemDate = mAdapter.getMonths().get(mAdapter.getMonths().size()-1);
-                    }
+                    MixedVisibleMonth lastMonth = mAdapter.getMonths().get(mAdapter.getMonths().size() - 1);
 
                     final MixedVisibleMonth nextMonth = CalendarDataFactory.newInstance()
-                            .create(CalendarUtils.getNextMonth(lastItemDate));
+                            .create(CalendarUtils.getNextMonth(lastMonth));
 
                     mAdapter.addItemAtTheEnd(nextMonth);
                     months.add(nextMonth);
@@ -216,27 +195,19 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
             case UP: // Load past dates
 
-                // Remove loading item
-//                        activity.mAdapter.removeFirstItem();
                 // Load more
-                months = new ArrayList<>(3);
-                for (int i=0; i < 3; i++){
+                months = new ArrayList<>(NUMBER_OF_MONTHS_TO_LOAD);
+                for (int i = 0; i < NUMBER_OF_MONTHS_TO_LOAD; i++) {
                     // Get current first item
-                    final MixedVisibleMonth firstItemDate = mAdapter.getMonths().get(0);
+                    final MixedVisibleMonth firstMonth = mAdapter.getMonths().get(0);
                     final MixedVisibleMonth previousMonth =
                             CalendarDataFactory.newInstance().create(CalendarUtils.getPreviousMonth(
-                                    firstItemDate.getCurrentMonth().getDay(0).getDate()));
-                    // activity.mAdapter.addItemAtBeginning(CalendarUtils.getPreviousMonth(firstItemDate));
-                    mAdapter.addItemAtBeginning(previousMonth);
+                                    firstMonth.getCurrentMonth().getDay(0).getDate()));
 
+                    mAdapter.addItemAtBeginning(previousMonth);
                     months.add(previousMonth);
                 }
 
-                break;
-
-            case NONE:
-                months = null;
-                // TODO: Consider adding here additional handling of such case
                 break;
 
             default:
@@ -244,20 +215,16 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
                 throw new IllegalStateException("Unknown case found");
         }
         // Inform regarding data set change and finish of loading process
-                mLoadingHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateVisibleItems();
-                        if (months != null && mOnNewMonthsAddedListener != null) {
-                            mOnNewMonthsAddedListener.onNewMonthsAdded(months);
-                        }
-                    }
-                }, 500);
-
-                mAdapter.setLoaded();
-
+        mLoadingHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (months != null && mOnNewMonthsAddedListener != null) {
+                    mOnNewMonthsAddedListener.onNewMonthsAdded(months);
+                }
             }
-        }, 700);
+        }, 500);
+
+        mAdapter.setLoaded();
     }
 
     private List<MixedVisibleMonth> initMonthListForDate(@NonNull Date date){

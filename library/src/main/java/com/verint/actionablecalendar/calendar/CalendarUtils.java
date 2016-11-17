@@ -265,12 +265,14 @@ public class CalendarUtils {
     }
 
     public static List<Date> generateInitialMonthList(@NonNull final Date desiredDate){
-
+        // generate range of 5 initial months
         final Date previousMonth = CalendarUtils.getPreviousMonth(desiredDate);
+        final Date previousPreviousMonth = CalendarUtils.getPreviousMonth(previousMonth);
         final Date nextMonth = CalendarUtils.getNextMonth(desiredDate);
+        final Date nextNextMonth = CalendarUtils.getNextMonth(nextMonth);
 
-        return generateMonthRange(CalendarUtils.getCalendarFrom(previousMonth),
-                CalendarUtils.getCalendarFrom(nextMonth));
+        return generateMonthRange(CalendarUtils.getCalendarFrom(previousPreviousMonth),
+                CalendarUtils.getCalendarFrom(nextNextMonth));
     }
 
     public static List<Date> generateMonthRange(final Calendar calendarStart,

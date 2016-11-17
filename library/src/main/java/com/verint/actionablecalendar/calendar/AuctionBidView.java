@@ -11,12 +11,17 @@ import android.widget.ImageView;
 
 import com.verint.mylibrary.R;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * TODO: Add JavaDoc
  *
  * Created by acheshihin on 8/11/2016.
  */
 public class AuctionBidView extends FrameLayout {
+    // todo: use weak references
+    private static final Map<Integer, Drawable> sCachedDrawablesByResId = new HashMap<>();
 
     private View mRootView;
     private ImageView mEventImage;
@@ -76,10 +81,24 @@ public class AuctionBidView extends FrameLayout {
     }
 
     public void setImage(@DrawableRes int imageId){
-        mEventImage.setImageResource(imageId);
+        mEventImage.setImageDrawable(getOrCreateCachedDrawable(imageId));
     }
 
     public void setBadge(@DrawableRes int badgeId){
-        mEventBadge.setImageResource(badgeId);
+        mEventBadge.setImageDrawable(getOrCreateCachedDrawable(badgeId));
     }
+
+    private Drawable getOrCreateCachedDrawable(@DrawableRes int drawableResId) {
+        if (drawableResId == 0) {
+            return null;
+        }
+        Drawable cachedDrawable = sCachedDrawablesByResId.get(drawableResId);
+        if (cachedDrawable == null) {
+            cachedDrawable = getResources().getDrawable(drawableResId);
+            sCachedDrawablesByResId.put(drawableResId, cachedDrawable);
+        }
+        return cachedDrawable;
+    }
+
+
 }

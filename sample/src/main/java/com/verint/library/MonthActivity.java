@@ -54,6 +54,7 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
 //        init();
         mRecyclerView = (CalendarRecyclerView) findViewById(R.id.rvMainActivityMonthList);
         mRecyclerView.setCalendarItemClickListener(this);
+        mRecyclerView.initFirstLoading();
 //        mRecyclerView.setOnLoadMoreListener(MonthActivity.this);
         initWeekDayNames();
     }

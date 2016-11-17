@@ -1,12 +1,17 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.graphics.Color;
+import android.graphics.Point;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener;
@@ -15,6 +20,8 @@ import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.mylibrary.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -27,16 +34,21 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public static final int VIEW_TYPE_MONTH_HEADER = 0;
     public static final int VIEW_TYPE_MONTH_DAY = 1;
+    public static final int VIEW_TYPE_LOADING = 2;
 
     private final List<MixedVisibleMonth> mMonths;
     private final List<Day> mDays;
 
     private OnLoadMoreListener mOnLoadMoreListener;
     private CalendarCallbacks mItemClickListener;
+    private VisualCommunicatorCallback mVisualCommunicatorCallback;
+    private Handler mUiHandler;
+
 
     private boolean mLoadingInProgress;
 
     public CalendarRecyclerViewAdapter(@NonNull List<MixedVisibleMonth> months) {
+        mUiHandler = new Handler(Looper.myLooper());
         mMonths = months;
         mDays = new ArrayList<>();
         for (MixedVisibleMonth month : months) {
@@ -46,7 +58,11 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public int getItemViewType(int position) {
-        return mDays.get(position).getDayState().getType() == DayState.DayType.MONTH_HEADER ?
+        Day day = mDays.get(position);
+        if (day == null) {
+            return VIEW_TYPE_LOADING;
+        }
+        return day.getDayState().getType() == DayState.DayType.MONTH_HEADER ?
                 VIEW_TYPE_MONTH_HEADER : VIEW_TYPE_MONTH_DAY;
     }
 
@@ -58,6 +74,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         } else if (viewType == VIEW_TYPE_MONTH_DAY) {
             return new MonthDayViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.month_grid_item, parent, false));
+        } else if (viewType == VIEW_TYPE_LOADING) {
+            return new LoadingViewHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.month_list_item_loading, parent, false));
         }
         return null;
     }
@@ -69,6 +88,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             ((HeaderViewHolder) holder).bind(day);
         } else if (holder instanceof MonthDayViewHolder) {
             ((MonthDayViewHolder) holder).bind(day, mItemClickListener);
+        } else if (holder instanceof LoadingViewHolder){
+            ((LoadingViewHolder) holder).mProgressBar.setIndeterminate(true);
+
         }
     }
 
@@ -83,11 +105,12 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
             case UP:
                 final int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
-                if (/*!mLoadingInProgress && */(firstVisibleItemPosition - 30) <= 0){
+                if (!mLoadingInProgress && (firstVisibleItemPosition - 30) <= 0){
+                    mLoadingInProgress = true;
                     if (mOnLoadMoreListener != null){
+                        addItemAtBeginning(null);
                         mOnLoadMoreListener.onLoadMore(scrollDirection);
                     }
-                    mLoadingInProgress = true;
                 }
                 break;
 
@@ -95,11 +118,12 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 final int totalItemCount = linearLayoutManager.getItemCount();
                 final int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
 
-                if (/*!mLoadingInProgress && */totalItemCount <= (lastVisibleItemPosition + 30)){
+                if (!mLoadingInProgress && totalItemCount <= (lastVisibleItemPosition + 30)){
+                    mLoadingInProgress = true;
                     if (mOnLoadMoreListener != null){
+                        addItemAtTheEnd(null);
                         mOnLoadMoreListener.onLoadMore(scrollDirection);
                     }
-                    mLoadingInProgress = true;
                 }
                 break;
 
@@ -114,6 +138,10 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public void setItemClickListener(CalendarCallbacks itemClickListener) {
         mItemClickListener = itemClickListener;
+    }
+
+    public void setVisualCommunicatorCallback(VisualCommunicatorCallback visualCommunicatorCallback) {
+        mVisualCommunicatorCallback = visualCommunicatorCallback;
     }
 
     public void clear() {
@@ -132,16 +160,32 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         notifyItemRangeInserted(0, mDays.size());
     }
 
+    private void removeAllItems(Day day) {
+        int index = -1;
+        do {
+            index = mDays.indexOf(day);
+            if (index >= 0) {
+                mDays.remove(index);
+                notifyItemRemoved(index);
+            }
+        } while (index >= 0);
+    }
+
     public boolean updateItem(final MixedVisibleMonth month, boolean shift, boolean timeOff, boolean auction) {
         if (month != null && month.getDayList().size() > 0) {
             Day firstDay = month.getDay(0);
-            int index = mDays.indexOf(firstDay);
+            final int index = mDays.indexOf(firstDay);
+            boolean isTodayHere = false;
             if (index >= 0) {
                 List<Day> newDays = month.getDayList();
+                final int newDaysSize = newDays.size();
                 // one by one update in case same date
-                for (int i = 0, size = newDays.size(); i < size; i++) {
+                for (int i = 0; i < newDaysSize; i++) {
                     Day day = mDays.get(i + index);
                     Day newDay = newDays.get(i);
+                    if (CalendarUtils.isToday(day)) {
+                        isTodayHere = true;
+                    }
                     if (shift) {
                         day.setShiftEnabled(newDay.isShiftEnabled());
                     }
@@ -153,7 +197,27 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         day.setAuctionWithBidItem(newDay.getAuctionWithBidItem());
                     }
                 }
-                notifyItemRangeChanged(index, newDays.size());
+                startIndexes.add(index);
+                endIndexes.add(index + newDays.size());
+                if (isTodayHere) {
+                    mUiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyItemRangeChanged(index, newDaysSize);
+                        }
+                    });
+                }
+//                if (mVisualCommunicatorCallback != null) {
+//                    int first = mVisualCommunicatorCallback.getFirstVisibleItemPosition();
+//                    int last = mVisualCommunicatorCallback.getLastVisibleItemPosition();
+//                    int lastUpdatedIndex = index + newDays.size();
+//                    if ((first <= index && index < last) || (first <= lastUpdatedIndex && lastUpdatedIndex < last)) {
+//                        int startIndex = Math.max(first, index);
+//                        notifyItemRangeChanged(startIndex, Math.min(last, lastUpdatedIndex) - startIndex);
+//                    }
+//                } else {
+//                    notifyItemRangeChanged(index, newDays.size());
+//                }
                 return true;
             }
         }
@@ -172,6 +236,30 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         return updated;
     }
 
+    public Point containsChangedIndexes(int start, int end) {
+        Iterator<Integer> startIterator = startIndexes.iterator();
+        Iterator<Integer> endIterator = endIndexes.iterator();
+        int maxStart = -1;
+        int minEnd = Integer.MAX_VALUE;
+        while (startIterator.hasNext() && endIterator.hasNext()) {
+            int startIndex = startIterator.next();
+            int endIndex = endIterator.next();
+            int s = Math.max(startIndex, start);
+            int e = Math.min(endIndex, end);
+            if (s < end && e > start) {
+                maxStart = Math.max(maxStart, s);
+                minEnd = Math.min(minEnd, e);
+            }
+        }
+        startIndexes.clear();
+        endIndexes.clear();
+        if (maxStart == -1) {
+            return null;
+        } else {
+            return new Point(maxStart, minEnd);
+        }
+    }
+
     /**
      * Adds {@link MixedVisibleMonth} item to data list at position 0 and notifies adapter that item was
      * inserted
@@ -183,12 +271,16 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (mMonths == null){
             throw new IllegalStateException("Data was not initialized");
         }
+        if (month == null) {
+            mDays.add(0, null);
+            notifyItemInserted(0);
+        } else {
+            mMonths.add(0, month);
 
-        mMonths.add(0, month);
-
-        List<Day> newDays = month.getDayListWithHeaders();
-        mDays.addAll(0, newDays);
-        notifyItemRangeInserted(0, newDays.size());
+            List<Day> newDays = month.getDayListWithHeaders();
+            mDays.addAll(0, newDays);
+            notifyItemRangeInserted(0, newDays.size());
+        }
     }
 
     /**
@@ -204,11 +296,18 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         // Count
-        mMonths.add(month);
+
         int startIndex = mDays.size();
-        List<Day> newDays = month.getDayListWithHeaders();
-        mDays.addAll(newDays);
-        notifyItemRangeInserted(startIndex, newDays.size());
+        if (month == null) {
+            mDays.add(null);
+            notifyItemInserted(startIndex);
+        } else {
+            mMonths.add(month);
+
+            List<Day> newDays = month.getDayListWithHeaders();
+            mDays.addAll(newDays);
+            notifyItemRangeInserted(startIndex, newDays.size());
+        }
     }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -224,13 +323,34 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
+    public boolean isLoadingInProgress() {
+        return mLoadingInProgress;
+    }
+
     public void setLoaded(){
         mLoadingInProgress = false;
+        removeAllItems(null);
     }
 
     public List<MixedVisibleMonth> getMonths() {
         return mMonths;
     }
+
+    LinkedHashSet<Integer> startIndexes = new LinkedHashSet<>();
+    LinkedHashSet<Integer> endIndexes = new LinkedHashSet<>();
+
+    // --------------------------------------------------------------------------------------------
+
+    protected static class LoadingViewHolder extends RecyclerView.ViewHolder {
+
+        protected ProgressBar mProgressBar;
+
+        protected LoadingViewHolder(View itemView) {
+            super(itemView);
+            mProgressBar = (ProgressBar) itemView.findViewById(R.id.pbMonthListItemLoadingProgressBar);
+        }
+    }
+
 
     class MonthDayViewHolder extends RecyclerView.ViewHolder {
 
@@ -250,7 +370,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         public void bind(@NonNull final Day day, final CalendarCallbacks listener){
-
             switch (day.getDayState().getType()){
 
                 case CURRENT_MONTH_DAY_NORMAL: // Current month day
@@ -389,5 +508,11 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             }
 
         }
+    }
+
+    public interface VisualCommunicatorCallback {
+        int getFirstVisibleItemPosition();
+
+        int getLastVisibleItemPosition();
     }
 }

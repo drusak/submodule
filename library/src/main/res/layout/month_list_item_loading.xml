@@ -9,7 +9,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/calendar_item_loader_progress_bar_margin"
-        android:layout_marginBottom="@dimen/calendar_item_loader_progress_bar_margin" />
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp" />
 
 </FrameLayout>

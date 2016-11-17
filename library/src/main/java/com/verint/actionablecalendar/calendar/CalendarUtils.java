@@ -264,6 +264,40 @@ public class CalendarUtils {
                 && todayCalendar.get(Calendar.DAY_OF_MONTH) == checkedCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
+    /**
+     * @return true if today day is before or same as @param day
+     */
+    public static boolean isTodayBeforeOrSame(@NonNull final Day day) {
+        // return DateUtils.isToday(day.getDate().getTime());
+        final Calendar todayCalendar = (Calendar) CALENDAR.clone();
+        todayCalendar.setTimeInMillis(System.currentTimeMillis());
+
+        final Calendar checkedCalendar = day.getCalendar();
+
+        if (todayCalendar.get(Calendar.YEAR) > checkedCalendar.get(Calendar.YEAR)) {
+            return false;
+        } else {
+            if (todayCalendar.get(Calendar.YEAR) < checkedCalendar.get(Calendar.YEAR)) {
+                return true;
+            } else {
+                if (todayCalendar.get(Calendar.MONTH) > checkedCalendar.get(Calendar.MONTH)) {
+                    return false;
+                } else {
+                    if (todayCalendar.get(Calendar.MONTH) < checkedCalendar.get(Calendar.MONTH)) {
+                        return true;
+                    } else {
+                        if (todayCalendar.get(Calendar.DAY_OF_MONTH) > checkedCalendar.get(Calendar.DAY_OF_MONTH)) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     public static List<Date> generateInitialMonthList(@NonNull final Date desiredDate){
         // generate range of 5 initial months
         final Date previousMonth = CalendarUtils.getPreviousMonth(desiredDate);

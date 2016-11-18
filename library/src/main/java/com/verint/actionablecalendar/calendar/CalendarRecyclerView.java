@@ -2,7 +2,6 @@ package com.verint.actionablecalendar.calendar;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 
 import static com.verint.actionablecalendar.calendar.models.Direction.DOWN;
-import static com.verint.actionablecalendar.calendar.models.Direction.NONE;
 import static com.verint.actionablecalendar.calendar.models.Direction.UP;
 
 /**
@@ -30,7 +28,18 @@ import static com.verint.actionablecalendar.calendar.models.Direction.UP;
 
 public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreListener {
 
-    private static final int NUMBER_OF_MONTHS_TO_LOAD = 2;
+    private static final int NUMBER_DAYS_IN_A_WEEK = 7;
+
+    public static final int NUMBER_OF_MONTHS_TO_LOAD = 2;
+    /**when user scrolls to start or end of calendar We'll call notify adapter only if visible days in intervals:<br>
+    at top - [0, NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE];
+    at bottom - [daysCount - NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE, daysCount]*/
+    private static final int NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE =
+            NUMBER_OF_MONTHS_TO_LOAD * 31/*max number of days in month*/ * 2/*multi coefficient*/;
+    private static final int NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE = 14;
+
+    private static final int NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION = 5;
+    private static final int ONE_UPDATE_ITERATION_MS = 100;
 
     CalendarRecyclerViewAdapter mAdapter;
     private OnNewMonthsAddedListener mOnNewMonthsAddedListener;
@@ -56,15 +65,19 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     private void init() {
         mUiHandler = new Handler();
         mLoadingHandler = new Handler();
-        mLayoutManager = new GridLayoutManager(getContext(), 7,
-                LinearLayoutManager.VERTICAL, false);
+        mLayoutManager = new GridLayoutManager(getContext(),
+                NUMBER_DAYS_IN_A_WEEK,
+                LinearLayoutManager.VERTICAL,
+                false);
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return getAdapter().getItemViewType(position) == CalendarRecyclerViewAdapter.VIEW_TYPE_MONTH_DAY ? 1 : 7;
+                // make non days items be with width as match_parent
+                return getAdapter().getItemViewType(position) == CalendarRecyclerViewAdapter.VIEW_TYPE_MONTH_DAY ?
+                        1 : NUMBER_DAYS_IN_A_WEEK;
             }
         });
-        mAdapter = new CalendarRecyclerViewAdapter(new ArrayList<MixedVisibleMonth>());
+        mAdapter = new CalendarRecyclerViewAdapter();
         setLayoutManager(mLayoutManager);
         setAdapter(mAdapter);
 
@@ -88,25 +101,18 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             }
         });
 
-
-//        // Scroll to current month if such month exists within currently set data list
-//        final int currentMonthPosition = mAdapter.getCurrentMonthPosition();
-//        if (RecyclerView.NO_POSITION != currentMonthPosition){
-//            mRecyclerView.scrollToPosition(currentMonthPosition);
-//        }
     }
 
-    private boolean updateVisibleItems() {
+    private boolean notifyUpdateVisibleItems() {
         final int first = mLayoutManager.findFirstVisibleItemPosition();
         final int last = mLayoutManager.findLastVisibleItemPosition();
         Log.i("!!!", "scroll notify changed " + first + "/" + (last - first));
-        int minStart = 150;
-        int maxEnd = mAdapter.getItemCount() - 150;
-        if (first < minStart) {
-            postUpdate(first - 10, last + 10);
+        final int maxEnd = mAdapter.getItemCount() - NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE;
+        if (first < NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE) {
+            postUpdate(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
             return true;
         } else if (last > maxEnd) {
-            postUpdate(first - 10, last + 10);
+            postUpdate(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
             return true;
         }
         return false;
@@ -117,14 +123,13 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             @Override
             public void run() {
                 if (getScrollState() == SCROLL_STATE_IDLE && currentPosition <= maxPosition) {
-                    Log.i("!!!", "notify part " + currentPosition + "/" + (5));
-                    mAdapter.notifyItemRangeChanged(currentPosition, 5);
-                    postUpdate(currentPosition + 5, maxPosition);
+                    mAdapter.notifyItemRangeChanged(currentPosition, NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION);
+                    postUpdate(currentPosition + NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION, maxPosition);
                 } else {
                     mUiHandler.removeCallbacksAndMessages(null);
                 }
             }
-        }, 100);
+        }, ONE_UPDATE_ITERATION_MS);
     }
 
 
@@ -132,7 +137,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         Date currentMonth = new Date(System.currentTimeMillis());
         List<MixedVisibleMonth> monthList = initMonthListForDate(currentMonth);
         setData(monthList);
-        scrollToPosition(mAdapter.getItemCount() / 2);
+        scrollToPosition(mAdapter.getCurrentMonthHeaderPosition());
     }
 
     public void setData(List<MixedVisibleMonth> months) {
@@ -152,11 +157,11 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     }
 
     public void updateMonths(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
-        mAdapter.updateItems(monthList, shift, timeOff, auction);
+        mAdapter.updateMonthsIndicators(monthList, shift, timeOff, auction);
         mLoadingHandler.post(new Runnable() {
             @Override
             public void run() {
-                updateVisibleItems();
+                notifyUpdateVisibleItems();
             }
         });
 

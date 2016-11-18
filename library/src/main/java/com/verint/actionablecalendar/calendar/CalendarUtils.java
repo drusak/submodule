@@ -236,6 +236,16 @@ public class CalendarUtils {
     }
 
     /**
+     * @return true if @param day is in same month as current date
+     */
+    public static boolean isSameMonthAsCurrent(@NonNull final Day day) {
+        Calendar todayCalendar = (Calendar) CALENDAR.clone();
+        todayCalendar.setTimeInMillis(System.currentTimeMillis());
+        return todayCalendar.get(Calendar.YEAR) == day.getCalendar().get(Calendar.YEAR) &&
+                todayCalendar.get(Calendar.MONTH) == day.getCalendar().get(Calendar.MONTH);
+    }
+
+    /**
      * Check if provided day is today and returns result accordingly
      *
      * @param day {@link Day}

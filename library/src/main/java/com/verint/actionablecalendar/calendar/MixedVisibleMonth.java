@@ -1,5 +1,7 @@
 package com.verint.actionablecalendar.calendar;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,6 +120,7 @@ public class MixedVisibleMonth {
         return dayList;
     }
 
+    @NonNull
     public List<Day> getDayListWithHeaders(){
 
         final List<Day> dayList = new ArrayList<>();

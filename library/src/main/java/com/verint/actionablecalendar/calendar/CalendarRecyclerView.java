@@ -140,6 +140,10 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         Date currentMonth = new Date(System.currentTimeMillis());
         List<MixedVisibleMonth> monthList = initMonthListForDate(currentMonth);
         setData(monthList);
+        scrollToCurrentMonth();
+    }
+
+    public void scrollToCurrentMonth() {
         scrollToPosition(mAdapter.getCurrentMonthHeaderPosition());
     }
 

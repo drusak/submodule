@@ -128,7 +128,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public void setMonths(List<MixedVisibleMonth> months) {
         clear();
-        addMonths(months, -1);
+        addMonths(months, false);
         notifyItemRangeInserted(0, mDays.size());
     }
 
@@ -139,7 +139,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
      * @param month {@link MixedVisibleMonth}|null
      */
     public void addItemAtBeginning(final MixedVisibleMonth month){
-        notifyItemRangeInserted(0, addMonth(month, 0));
+        notifyItemRangeInserted(0, addMonth(month, true));
     }
 
     /**
@@ -150,7 +150,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
      */
     public void addItemAtTheEnd(final MixedVisibleMonth month){
         int startIndex = mDays.size();
-        notifyItemRangeInserted(startIndex, addMonth(month, startIndex));
+        notifyItemRangeInserted(startIndex, addMonth(month, false));
     }
 
     public boolean updateMonthsIndicators(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
@@ -175,22 +175,22 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     /**
      * add new month into adapter
-     * @param position use -1 if want to ignore position and add at the end, otherwise month will be added into specified position
+     * @param true if need to insert items at beginning, false - at end
      * @return number of added days
      */
-    private int addMonth(MixedVisibleMonth month, int position) {
-        return addMonths(Collections.singletonList(month), position);
+    private int addMonth(MixedVisibleMonth month, boolean atBeginning) {
+        return addMonths(Collections.singletonList(month), atBeginning);
     }
 
     /**
-     * @see #addMonth(MixedVisibleMonth, int)
+     * @see #addMonth(MixedVisibleMonth, boolean)
      */
-    private int addMonths(List<MixedVisibleMonth> months, int position) {
+    private int addMonths(List<MixedVisibleMonth> months, boolean atBeginning) {
         int countAddedDays = 0;
-        if (position >= 0) {
-            mMonths.addAll(months);
+        if (atBeginning) {
+            mMonths.addAll(0, months);
         } else {
-            mMonths.addAll(position, months);
+            mMonths.addAll(months);
         }
         for (MixedVisibleMonth month : months) {
             // check if month is current, and update current month position
@@ -201,8 +201,8 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 }
             }
             List<Day> monthDays = month.getDayListWithHeaders();
-            if (position >= 0) {
-                mDays.addAll(position, monthDays);
+            if (atBeginning) {
+                mDays.addAll(0, monthDays);
             } else {
                 mDays.addAll(monthDays);
             }
@@ -285,6 +285,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     class MonthDayViewHolder extends RecyclerView.ViewHolder {
 
         protected View mRootView;
+        protected View mContainerForIndicators;
         protected TextView mMonthDay;
         protected View mShiftIndicator;
         protected AuctionBidView mDayIconFirstLevelView;
@@ -293,6 +294,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         public MonthDayViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
+            mContainerForIndicators = itemView.findViewById(R.id.containerMonthGridItem);
             mMonthDay = (TextView) itemView.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = itemView.findViewById(R.id.vMonthGridItemShiftIndicator);
             mDayIconFirstLevelView = (AuctionBidView) itemView.findViewById(R.id.abvCalendarDayIconFirstLevelView);
@@ -312,9 +314,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
 
                     if (!CalendarUtils.isToday(day)){ // Not today
-                        mRootView.setBackgroundColor(Color.WHITE);
+                        mContainerForIndicators.setBackgroundColor(Color.WHITE);
                     } else { // Today
-                        mRootView.setBackgroundResource(R.drawable.calendar_item_current_day_background);
+                        mContainerForIndicators.setBackgroundResource(R.drawable.calendar_item_current_day_background);
                     }
 
                     // Specify click listeners
@@ -354,9 +356,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     mMonthDay.setText(String.valueOf(day.getMonthDay()));
 
                     if (!CalendarUtils.isToday(day)){ // Not today
-                        mRootView.setBackgroundColor(Color.parseColor("#ebebeb"));
+                        mContainerForIndicators.setBackgroundColor(Color.parseColor("#ebebeb"));
                     } else { // Today
-                        mRootView.setBackgroundResource(R.drawable.calendar_item_current_day_background);
+                        mContainerForIndicators.setBackgroundResource(R.drawable.calendar_item_current_day_background);
                     }
 
                     // Specify click listeners
@@ -391,7 +393,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     mDayIconFirstLevelView.setVisibility(View.GONE);
                     mDayIconSecondLevelView.setVisibility(View.GONE);
 
-                    mRootView.setBackgroundColor(Color.WHITE);
+                    mContainerForIndicators.setBackgroundColor(Color.WHITE);
 
                     // Remove click listeners
                     mRootView.setOnClickListener(null);

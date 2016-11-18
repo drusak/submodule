@@ -109,22 +109,25 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         Log.i("!!!", "scroll notify changed " + first + "/" + (last - first));
         final int maxEnd = mAdapter.getItemCount() - NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE;
         if (first < NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE) {
-            postUpdate(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
+            postNotifyUpdateByParts(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
             return true;
         } else if (last > maxEnd) {
-            postUpdate(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
+            postNotifyUpdateByParts(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
             return true;
         }
         return false;
     }
 
-    private void postUpdate(final int currentPosition, final int maxPosition) {
+    /**
+     * send notification to adapter by parts #NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION with specific interval of time
+     */
+    private void postNotifyUpdateByParts(final int currentPosition, final int maxPosition) {
         mUiHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (getScrollState() == SCROLL_STATE_IDLE && currentPosition <= maxPosition) {
                     mAdapter.notifyItemRangeChanged(currentPosition, NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION);
-                    postUpdate(currentPosition + NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION, maxPosition);
+                    postNotifyUpdateByParts(currentPosition + NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION, maxPosition);
                 } else {
                     mUiHandler.removeCallbacksAndMessages(null);
                 }
@@ -179,9 +182,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
             case DOWN:  // Load future dates
 
-                // Remove loading item
-//                        activity.mAdapter.removeLastItem();
-
                 // Load more
                 months = new ArrayList<>(NUMBER_OF_MONTHS_TO_LOAD);
                 int listCount = mAdapter.getMonths().size();
@@ -219,7 +219,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
                 months = null;
                 throw new IllegalStateException("Unknown case found");
         }
-        // Inform regarding data set change and finish of loading process
+        // Inform regarding data set change and finish of loading process with delay
         mLoadingHandler.postDelayed(new Runnable() {
             @Override
             public void run() {

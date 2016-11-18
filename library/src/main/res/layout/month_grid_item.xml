@@ -1,55 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/calendar_item_min_height">
+    android:layout_height="wrap_content">
 
-    <!-- Month day -->
-
-    <TextView
-        android:id="@+id/tvMonthGridItemMonthDay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/containerMonthGridItem"
+        android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:textSize="@dimen/calendar_item_text_size"
-        android:text="29"/>
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/calendar_item_min_height">
 
-    <!-- Shift indicator -->
+        <!-- Month day -->
+
+        <TextView
+            android:id="@+id/tvMonthGridItemMonthDay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:textSize="@dimen/calendar_item_text_size"
+            android:text="29"/>
+
+        <!-- Shift indicator -->
+
+        <View
+            android:id="@+id/vMonthGridItemShiftIndicator"
+            android:layout_width="@dimen/calendar_item_shift_indicator_width"
+            android:layout_height="@dimen/calendar_item_shift_indicator_height"
+            android:background="@drawable/shift_indicator_background"/>
+
+        <!-- request indicator -->
+
+        <com.verint.actionablecalendar.calendar.AuctionBidView
+            android:id="@+id/abvCalendarDayIconFirstLevelView"
+            android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
+            android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
+            android:layout_width="@dimen/calendar_item_event_view_image_size"
+            android:layout_height="@dimen/calendar_item_event_view_image_size"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:showBadge="true"
+            tools:imageSrc="@drawable/ic_toof_req_my"/>
+
+        <!-- auction indicator -->
+
+        <com.verint.actionablecalendar.calendar.AuctionBidView
+            android:id="@+id/abvCalendarDayIconSecondLevelView"
+            android:layout_width="@dimen/calendar_item_event_view_image_size"
+            android:layout_height="@dimen/calendar_item_event_view_image_size"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:showBadge="true"
+            tools:imageSrc="@drawable/ic_toof_req_my"/>
+    </LinearLayout>
 
     <View
-        android:id="@+id/vMonthGridItemShiftIndicator"
-        android:layout_width="@dimen/calendar_item_shift_indicator_width"
-        android:layout_height="@dimen/calendar_item_shift_indicator_height"
-        android:background="@drawable/shift_indicator_background"/>
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/containerMonthGridItem"
+        android:background="@color/month_grid_item_divider" />
 
-    <!-- request indicator -->
-
-    <com.verint.actionablecalendar.calendar.AuctionBidView
-        android:id="@+id/abvCalendarDayIconFirstLevelView"
-        android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
-        android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
-        android:layout_width="@dimen/calendar_item_event_view_image_size"
-        android:layout_height="@dimen/calendar_item_event_view_image_size"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:showBadge="true"
-        tools:imageSrc="@drawable/ic_toof_req_my"/>
-
-    <!-- auction indicator -->
-
-    <com.verint.actionablecalendar.calendar.AuctionBidView
-        android:id="@+id/abvCalendarDayIconSecondLevelView"
-        android:layout_width="@dimen/calendar_item_event_view_image_size"
-        android:layout_height="@dimen/calendar_item_event_view_image_size"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:showBadge="true"
-        tools:imageSrc="@drawable/ic_toof_req_my"/>
-
-</LinearLayout>
+</RelativeLayout>

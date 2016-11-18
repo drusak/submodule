@@ -33,7 +33,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public static final int VIEW_TYPE_MONTH_DAY = 1;
 
     private static final int MIN_DAYS_INTERVAL_COUNT_TO_START_LOADING_MORE =
-            CalendarRecyclerView.NUMBER_OF_MONTHS_TO_LOAD * 31 / 2;
+            CalendarRecyclerView.NUMBER_OF_MONTHS_TO_LOAD * 31 / 2 + CalendarRecyclerView.NUMBER_OF_MONTHS_TO_LOAD * 10/*additional days*/ ;
 
     private final List<MixedVisibleMonth> mMonths = new ArrayList<>();
     private final List<Day> mDays = new ArrayList<>();

@@ -35,7 +35,8 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     at top - [0, NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE];
     at bottom - [daysCount - NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE, daysCount]*/
     private static final int NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE =
-            NUMBER_OF_MONTHS_TO_LOAD * 31/*max number of days in month*/ * 2/*multi coefficient*/;
+            NUMBER_OF_MONTHS_TO_LOAD * 31/*max number of days in month*/ * 2/*multi coefficient*/ +
+                    NUMBER_OF_MONTHS_TO_LOAD * 10/*additional days*/;
     private static final int NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE = 14;
 
     private static final int NUMBER_DAYS_TO_UPDATE_BY_ONE_UPDATE_ITERATION = 5;

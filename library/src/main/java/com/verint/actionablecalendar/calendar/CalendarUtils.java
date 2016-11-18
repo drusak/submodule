@@ -269,9 +269,14 @@ public class CalendarUtils {
         todayCalendar.setTimeInMillis(System.currentTimeMillis());
 
         final Calendar checkedCalendar = day.getCalendar();
-        return todayCalendar.get(Calendar.YEAR) == checkedCalendar.get(Calendar.YEAR)
-                &&  todayCalendar.get(Calendar.MONTH) == checkedCalendar.get(Calendar.MONTH)
-                && todayCalendar.get(Calendar.DAY_OF_MONTH) == checkedCalendar.get(Calendar.DAY_OF_MONTH);
+        return isSameDay(todayCalendar, checkedCalendar);
+    }
+
+    public static boolean isSameDay(@NonNull final Calendar day1, @NonNull final Calendar day2){
+
+        return day1.get(Calendar.YEAR) == day2.get(Calendar.YEAR)
+                &&  day1.get(Calendar.MONTH) == day2.get(Calendar.MONTH)
+                && day1.get(Calendar.DAY_OF_MONTH) == day2.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
@@ -426,5 +431,24 @@ public class CalendarUtils {
         calendar.set(Calendar.MILLISECOND, 999);
 
         return calendar.getTime();
+    }
+
+    /**
+     * Counting hash code of calendar date, so using only year-month-day combination, and 00:00:00.000 time
+     * @return hashcode of @param calendar date
+     */
+    public static int getHashKey(@NonNull final Calendar calendar){
+        // TODO: Check performance, maybe better to use processing locally
+        return CalendarUtils.getCalendarBeginOfDay(calendar).getTime().toString().hashCode();
+    }
+
+    /**
+     * Counting hash code of Date, so using only year-month-day combination, and 00:00:00.000 time
+     * @see #getHashKey(Date)
+     * @return hashcode of @param date
+     */
+    public static int getHashKey(@NonNull final Date date){
+        // TODO: consider making here dedicated implementation in order to reduce usage of stack memory
+        return getHashKey(CalendarUtils.getCalendarFrom(date));
     }
 }

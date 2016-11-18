@@ -15,8 +15,11 @@ import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.mylibrary.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Dmitry Rusak on 11/15/16.
@@ -175,7 +178,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     /**
      * add new month into adapter
-     * @param true if need to insert items at beginning, false - at end
+     * @param atBeginning true if need to insert items at beginning, false - at end
      * @return number of added days
      */
     private int addMonth(MixedVisibleMonth month, boolean atBeginning) {
@@ -255,7 +258,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         return false;
     }
 
-    class HeaderViewHolder extends RecyclerView.ViewHolder {
+    private class HeaderViewHolder extends RecyclerView.ViewHolder {
         private TextView mTvTitle;
 
         public HeaderViewHolder(View itemView) {
@@ -264,8 +267,13 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         public void bind(Day day) {
-            mTvTitle.setText(day.getDate().toString());
+            Calendar calendar = CalendarUtils.getCalendarFrom(day.getDate());
+            final String monthName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG,
+                    Locale.getDefault());
+            final int year = calendar.get(Calendar.YEAR);
+            mTvTitle.setText(String.format(Locale.getDefault(), "%s %d", monthName, year));
         }
+
     }
 
     public boolean isLoadingInProgress() {
@@ -282,7 +290,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     // --------------------------------------------------------------------------------------------
 
-    class MonthDayViewHolder extends RecyclerView.ViewHolder {
+    private class MonthDayViewHolder extends RecyclerView.ViewHolder {
 
         protected View mRootView;
         protected View mContainerForIndicators;

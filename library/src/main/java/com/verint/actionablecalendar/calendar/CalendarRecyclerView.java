@@ -144,7 +144,8 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     }
 
     public void scrollToCurrentMonth() {
-        scrollToPosition(mAdapter.getCurrentMonthHeaderPosition());
+        // according to {@link http://stackoverflow.com/questions/30845742/smoothscrolltoposition-doesnt-work-properly-with-recyclerview}
+        mLayoutManager.scrollToPositionWithOffset(mAdapter.getCurrentMonthHeaderPosition(), 0);
     }
 
     public void setData(List<MixedVisibleMonth> months) {

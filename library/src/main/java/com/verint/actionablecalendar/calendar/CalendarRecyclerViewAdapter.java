@@ -196,16 +196,22 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             mMonths.addAll(months);
         }
         for (MixedVisibleMonth month : months) {
+            boolean isCurrentMonth = false;
             // check if month is current, and update current month position
             if (month.getCurrentMonth().size() > 0) {
                 Day firstDayOfMonth = month.getCurrentMonth().getDay(0);
                 if (CalendarUtils.isSameMonthAsCurrent(firstDayOfMonth)) {
                     mCurrentMonthHeaderPosition = mDays.size();
+                    isCurrentMonth = true;
                 }
             }
             List<Day> monthDays = month.getDayListWithHeaders();
             if (atBeginning) {
                 mDays.addAll(0, monthDays);
+                if (!isCurrentMonth) {
+                    // We're adding days under today
+                    mCurrentMonthHeaderPosition += monthDays.size();
+                }
             } else {
                 mDays.addAll(monthDays);
             }

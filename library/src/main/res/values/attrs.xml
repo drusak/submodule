@@ -4,5 +4,7 @@
         <attr name="showBadge" format="boolean"/>
         <attr name="imageSrc" format="integer"/>
         <attr name="badgeSrc" format="integer"/>
+        <attr name="badgeWidth" format="dimension"/>
+        <attr name="badgeHeight" format="dimension"/>
     </declare-styleable>
 </resources>

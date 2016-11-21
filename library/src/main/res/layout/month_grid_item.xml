@@ -45,6 +45,8 @@
             android:visibility="gone"
             tools:visibility="visible"
             app:showBadge="true"
+            app:badgeWidth="@dimen/calendar_item_badge_width"
+            app:badgeHeight="@dimen/calendar_item_badge_width"
             tools:imageSrc="@drawable/ic_toof_req_my"/>
 
         <!-- auction indicator -->
@@ -56,6 +58,8 @@
             android:visibility="gone"
             tools:visibility="visible"
             app:showBadge="true"
+            app:badgeWidth="@dimen/calendar_item_badge_width"
+            app:badgeHeight="@dimen/calendar_item_badge_width"
             tools:imageSrc="@drawable/ic_toof_req_my"/>
     </LinearLayout>
 

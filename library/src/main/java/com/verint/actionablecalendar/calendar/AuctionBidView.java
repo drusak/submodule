@@ -47,6 +47,8 @@ public class AuctionBidView extends FrameLayout {
         final boolean showBadge;
         final Drawable imageDrawable;
         final Drawable badgeDrawable;
+        int badgeWidth = -1;
+        int badgeHeight = -1;
 
         if (attrs != null){
 
@@ -56,6 +58,8 @@ public class AuctionBidView extends FrameLayout {
                 showBadge = typedArray.getBoolean(R.styleable.AuctionBidView_showBadge, false);
                 imageDrawable = typedArray.getDrawable(R.styleable.AuctionBidView_imageSrc);
                 badgeDrawable = typedArray.getDrawable(R.styleable.AuctionBidView_badgeSrc);
+                badgeWidth = typedArray.getDimensionPixelSize(R.styleable.AuctionBidView_badgeWidth, -1);
+                badgeHeight = typedArray.getDimensionPixelSize(R.styleable.AuctionBidView_badgeHeight, -1);
 
             } finally {
                 typedArray.recycle();
@@ -78,6 +82,14 @@ public class AuctionBidView extends FrameLayout {
 
         // Adjust badge visibility
         mEventBadge.setVisibility(showBadge ? View.VISIBLE : View.INVISIBLE);
+        if (showBadge) {
+            if (badgeWidth > 0 && badgeHeight > 0) {
+                mEventBadge.getLayoutParams().width = badgeWidth;
+                mEventBadge.getLayoutParams().height = badgeHeight;
+            }
+        }
+
+
     }
 
     public void setImage(@DrawableRes int imageId){

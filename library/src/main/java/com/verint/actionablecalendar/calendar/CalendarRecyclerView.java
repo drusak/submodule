@@ -102,6 +102,19 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             }
         });
 
+        addOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (getScrollState() == SCROLL_STATE_IDLE) {
+                    notifyUpdateVisibleItems();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            }
+        });
+
     }
 
     private boolean notifyUpdateVisibleItems() {
@@ -145,6 +158,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     }
 
     public void scrollToCurrentMonth() {
+        stopScroll();
         // according to {@link http://stackoverflow.com/questions/30845742/smoothscrolltoposition-doesnt-work-properly-with-recyclerview}
         mLayoutManager.scrollToPositionWithOffset(mAdapter.getCurrentMonthHeaderPosition(), 0);
     }

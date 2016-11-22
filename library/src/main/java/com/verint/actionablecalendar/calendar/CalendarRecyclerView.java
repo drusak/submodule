@@ -46,7 +46,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     private OnNewMonthsAddedListener mOnNewMonthsAddedListener;
     private GridLayoutManager mLayoutManager;
     private Handler mUiHandler;
-    private Handler mLoadingHandler;
+    private Handler mLoadingMoreHandler;
 
     public CalendarRecyclerView(Context context) {
         super(context);
@@ -65,7 +65,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
     private void init() {
         mUiHandler = new Handler();
-        mLoadingHandler = new Handler();
+        mLoadingMoreHandler = new Handler();
         mLayoutManager = new GridLayoutManager(getContext(),
                 NUMBER_DAYS_IN_A_WEEK,
                 LinearLayoutManager.VERTICAL,
@@ -102,19 +102,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             }
         });
 
-        addOnScrollListener(new OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (getScrollState() == SCROLL_STATE_IDLE) {
-                    notifyUpdateVisibleItems();
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            }
-        });
-
     }
 
     private boolean notifyUpdateVisibleItems() {
@@ -123,9 +110,13 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         Log.i("!!!", "scroll notify changed " + first + "/" + (last - first));
         final int maxEnd = mAdapter.getItemCount() - NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE;
         if (first < NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE) {
+            // clear previous update messages
+            mUiHandler.removeCallbacksAndMessages(null);
             postNotifyUpdateByParts(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
             return true;
         } else if (last > maxEnd) {
+            // clear previous update messages
+            mUiHandler.removeCallbacksAndMessages(null);
             postNotifyUpdateByParts(first - NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE, last + NUMBER_DAYS_TO_UPDATE_OVER_VISIBLE);
             return true;
         }
@@ -155,12 +146,30 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         List<MixedVisibleMonth> monthList = initMonthListForDate(currentMonth);
         setData(monthList);
         scrollToCurrentMonth();
+        // fake call of smooth scroll, so it will invalidate calendar
+        smoothScrollToCurrentMonth();
+        addOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (getScrollState() == SCROLL_STATE_IDLE) {
+                    notifyUpdateVisibleItems();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            }
+        });
     }
 
     public void scrollToCurrentMonth() {
         stopScroll();
         // according to {@link http://stackoverflow.com/questions/30845742/smoothscrolltoposition-doesnt-work-properly-with-recyclerview}
         mLayoutManager.scrollToPositionWithOffset(mAdapter.getCurrentMonthHeaderPosition(), 0);
+    }
+
+    public void smoothScrollToCurrentMonth() {
+        smoothScrollToPosition(mAdapter.getCurrentMonthHeaderPosition());
     }
 
     public void setData(List<MixedVisibleMonth> months) {
@@ -181,7 +190,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
     public void updateMonths(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
         mAdapter.updateMonthsIndicators(monthList, shift, timeOff, auction);
-        mLoadingHandler.post(new Runnable() {
+        mLoadingMoreHandler.post(new Runnable() {
             @Override
             public void run() {
                 notifyUpdateVisibleItems();
@@ -240,7 +249,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
                 throw new IllegalStateException("Unknown case found");
         }
         // Inform regarding data set change and finish of loading process with delay
-        mLoadingHandler.postDelayed(new Runnable() {
+        mLoadingMoreHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (months != null && mOnNewMonthsAddedListener != null) {

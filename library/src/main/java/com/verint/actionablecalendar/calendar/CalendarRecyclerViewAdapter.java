@@ -156,10 +156,10 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         notifyItemRangeInserted(startIndex, addMonth(month, false));
     }
 
-    public boolean updateMonthsIndicators(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
+    public boolean updateMonthsIndicators(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean myRequests) {
         boolean updated = false;
         for (MixedVisibleMonth each : monthList) {
-            boolean oneItemUpdated = updateItemIndicators(each, shift, timeOff, auction);
+            boolean oneItemUpdated = updateItemIndicators(each, shift, myRequests);
             if (!updated) {
                 updated = oneItemUpdated;
             }
@@ -236,7 +236,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
      * We're not setting new days, but updating existing according to indicators to update
      * @return true if items were updated
      */
-    private boolean updateItemIndicators(final MixedVisibleMonth month, boolean shift, boolean timeOff, boolean auction) {
+    private boolean updateItemIndicators(final MixedVisibleMonth month, boolean shift, boolean myRequests) {
         if (month != null && month.getDayList().size() > 0) {
             Day firstDay = month.getDay(0);
             final int index = mDays.indexOf(firstDay);
@@ -250,10 +250,8 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     if (shift) {
                         day.setShiftEnabled(newDay.isShiftEnabled());
                     }
-                    if (timeOff) {
+                    if (myRequests) {
                         day.setTimeOffItem(newDay.getTimeOffItem());
-                    }
-                    if (auction) {
                         day.setAuctionNoBidItem(newDay.getAuctionNoBidItem());
                         day.setAuctionWithBidItem(newDay.getAuctionWithBidItem());
                     }

@@ -107,7 +107,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     private boolean notifyUpdateVisibleItems() {
         final int first = mLayoutManager.findFirstVisibleItemPosition();
         final int last = mLayoutManager.findLastVisibleItemPosition();
-        Log.i("!!!", "scroll notify changed " + first + "/" + (last - first));
         final int maxEnd = mAdapter.getItemCount() - NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE;
         if (first < NUMBER_DAYS_LIMIT_TO_START_VIEWS_UPDATE) {
             // clear previous update messages
@@ -188,8 +187,8 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         mOnNewMonthsAddedListener = onNewMonthsAddedListener;
     }
 
-    public void updateMonths(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean timeOff, boolean auction) {
-        mAdapter.updateMonthsIndicators(monthList, shift, timeOff, auction);
+    public void updateMonths(@NonNull final List<MixedVisibleMonth> monthList, boolean shift, boolean myRequests) {
+        mAdapter.updateMonthsIndicators(monthList, shift, myRequests);
         mLoadingMoreHandler.post(new Runnable() {
             @Override
             public void run() {

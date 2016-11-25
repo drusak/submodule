@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * Created by acheshihin on 8/11/2016.
  */
-public class AuctionBidView extends FrameLayout {
+public class EventIndicatorView extends FrameLayout {
     // todo: use weak references
     private static final Map<Integer, Drawable> sCachedDrawablesByResId = new HashMap<>();
 
@@ -27,12 +27,12 @@ public class AuctionBidView extends FrameLayout {
     private ImageView mEventImage;
     private ImageView mEventBadge;
 
-    public AuctionBidView(Context context) {
+    public EventIndicatorView(Context context) {
         super(context);
         init(context, null);
     }
 
-    public AuctionBidView(Context context, AttributeSet attrs) {
+    public EventIndicatorView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
@@ -52,14 +52,14 @@ public class AuctionBidView extends FrameLayout {
 
         if (attrs != null){
 
-            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AuctionBidView, 0, 0);
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.EventIndicatorView, 0, 0);
 
             try{
-                showBadge = typedArray.getBoolean(R.styleable.AuctionBidView_showBadge, false);
-                imageDrawable = typedArray.getDrawable(R.styleable.AuctionBidView_imageSrc);
-                badgeDrawable = typedArray.getDrawable(R.styleable.AuctionBidView_badgeSrc);
-                badgeWidth = typedArray.getDimensionPixelSize(R.styleable.AuctionBidView_badgeWidth, -1);
-                badgeHeight = typedArray.getDimensionPixelSize(R.styleable.AuctionBidView_badgeHeight, -1);
+                showBadge = typedArray.getBoolean(R.styleable.EventIndicatorView_showBadge, false);
+                imageDrawable = typedArray.getDrawable(R.styleable.EventIndicatorView_imageSrc);
+                badgeDrawable = typedArray.getDrawable(R.styleable.EventIndicatorView_badgeSrc);
+                badgeWidth = typedArray.getDimensionPixelSize(R.styleable.EventIndicatorView_badgeWidth, -1);
+                badgeHeight = typedArray.getDimensionPixelSize(R.styleable.EventIndicatorView_badgeHeight, -1);
 
             } finally {
                 typedArray.recycle();

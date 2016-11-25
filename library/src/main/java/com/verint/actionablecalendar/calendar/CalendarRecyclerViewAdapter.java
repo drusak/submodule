@@ -17,7 +17,6 @@ import com.verint.mylibrary.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -300,8 +299,8 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         protected View mContainerForIndicators;
         protected TextView mMonthDay;
         protected View mShiftIndicator;
-        protected AuctionBidView mDayIconFirstLevelView;
-        protected AuctionBidView mDayIconSecondLevelView;
+        protected EventIndicatorView mDayIconFirstLevelView;
+        protected EventIndicatorView mDayIconSecondLevelView;
 
         public MonthDayViewHolder(View itemView) {
             super(itemView);
@@ -309,8 +308,8 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             mContainerForIndicators = itemView.findViewById(R.id.containerMonthGridItem);
             mMonthDay = (TextView) itemView.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = itemView.findViewById(R.id.vMonthGridItemShiftIndicator);
-            mDayIconFirstLevelView = (AuctionBidView) itemView.findViewById(R.id.abvCalendarDayIconFirstLevelView);
-            mDayIconSecondLevelView = (AuctionBidView) itemView.findViewById(R.id.abvCalendarDayIconSecondLevelView);
+            mDayIconFirstLevelView = (EventIndicatorView) itemView.findViewById(R.id.abvCalendarDayIconFirstLevelView);
+            mDayIconSecondLevelView = (EventIndicatorView) itemView.findViewById(R.id.abvCalendarDayIconSecondLevelView);
         }
 
         public void bind(@NonNull final Day day, final CalendarCallbacks listener){

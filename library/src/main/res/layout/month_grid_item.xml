@@ -36,7 +36,7 @@
 
         <!-- request indicator -->
 
-        <com.verint.actionablecalendar.calendar.AuctionBidView
+        <com.verint.actionablecalendar.calendar.EventIndicatorView
             android:id="@+id/abvCalendarDayIconFirstLevelView"
             android:layout_marginTop="@dimen/calendar_item_event_view_image_margin_vertical"
             android:layout_marginBottom="@dimen/calendar_item_event_view_image_margin_vertical"
@@ -51,7 +51,7 @@
 
         <!-- auction indicator -->
 
-        <com.verint.actionablecalendar.calendar.AuctionBidView
+        <com.verint.actionablecalendar.calendar.EventIndicatorView
             android:id="@+id/abvCalendarDayIconSecondLevelView"
             android:layout_width="@dimen/calendar_item_event_view_image_size"
             android:layout_height="@dimen/calendar_item_event_view_image_size"

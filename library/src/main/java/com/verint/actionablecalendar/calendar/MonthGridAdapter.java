@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.verint.mylibrary.R;
@@ -115,16 +114,16 @@ public class MonthGridAdapter extends BaseAdapter {
         protected View mRootView;
         protected TextView mMonthDay;
         protected View mShiftIndicator;
-        protected AuctionBidView mDayIconFirstLevelView;
-        protected AuctionBidView mDayIconSecondLevelView;
+        protected EventIndicatorView mDayIconFirstLevelView;
+        protected EventIndicatorView mDayIconSecondLevelView;
 
         protected MonthGridViewHolder(@NonNull final View view){
 
             mRootView = view;
             mMonthDay = (TextView) view.findViewById(R.id.tvMonthGridItemMonthDay);
             mShiftIndicator = view.findViewById(R.id.vMonthGridItemShiftIndicator);
-            mDayIconFirstLevelView = (AuctionBidView) view.findViewById(R.id.abvCalendarDayIconFirstLevelView);
-            mDayIconSecondLevelView = (AuctionBidView) view.findViewById(R.id.abvCalendarDayIconSecondLevelView);
+            mDayIconFirstLevelView = (EventIndicatorView) view.findViewById(R.id.abvCalendarDayIconFirstLevelView);
+            mDayIconSecondLevelView = (EventIndicatorView) view.findViewById(R.id.abvCalendarDayIconSecondLevelView);
         }
 
         protected void bind(@NonNull final Day day, final int position,

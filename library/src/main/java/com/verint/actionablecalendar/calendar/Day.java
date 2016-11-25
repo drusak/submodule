@@ -3,12 +3,10 @@ package com.verint.actionablecalendar.calendar;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
-import com.verint.actionablecalendar.calendar.models.AuctionBid;
-import com.verint.actionablecalendar.calendar.models.Bid;
+import com.verint.actionablecalendar.calendar.models.EventIndicator;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Data for single day item which will be represented as grid item of {@link CalendarWidget}
@@ -26,11 +24,11 @@ public class Day {
     private boolean mShiftEnabled;
 
     // view for time off icon and badge
-    private AuctionBid mTimeOffItem;
+    private EventIndicator mTimeOffItem;
     // view for auction with bids icon and badge
-    private AuctionBid mAuctionWithBidItem;
+    private EventIndicator mAuctionWithBidItem;
     // view for auction without bids icon and badge
-    private AuctionBid mAuctionNoBidItem;
+    private EventIndicator mAuctionNoBidItem;
 
     public Day(final Date date, @NonNull DayState dayState){
 
@@ -90,27 +88,27 @@ public class Day {
         mShiftEnabled = shiftEnabled;
     }
 
-    public AuctionBid getTimeOffItem() {
+    public EventIndicator getTimeOffItem() {
         return mTimeOffItem;
     }
 
-    public void setTimeOffItem(AuctionBid timeOffItem) {
+    public void setTimeOffItem(EventIndicator timeOffItem) {
         mTimeOffItem = timeOffItem;
     }
 
-    public AuctionBid getAuctionWithBidItem() {
+    public EventIndicator getAuctionWithBidItem() {
         return mAuctionWithBidItem;
     }
 
-    public void setAuctionWithBidItem(AuctionBid auctionWithBidItem) {
+    public void setAuctionWithBidItem(EventIndicator auctionWithBidItem) {
         mAuctionWithBidItem = auctionWithBidItem;
     }
 
-    public AuctionBid getAuctionNoBidItem() {
+    public EventIndicator getAuctionNoBidItem() {
         return mAuctionNoBidItem;
     }
 
-    public void setAuctionNoBidItem(AuctionBid auctionNoBidItem) {
+    public void setAuctionNoBidItem(EventIndicator auctionNoBidItem) {
         mAuctionNoBidItem = auctionNoBidItem;
     }
 }

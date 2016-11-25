@@ -3,16 +3,16 @@ package com.verint.actionablecalendar.calendar.models;
 import android.support.annotation.DrawableRes;
 
 /**
- * TODO: Add JavaDoc
+ * Contains Drawable resources for Icon and Badge of Indicator (e.g. for Calendar)
  *
  * Created by acheshihin on 8/11/2016.
  */
-public class AuctionBid {
+public class EventIndicator {
 
     private int mAuctionImage;
     private int mBadgeImage;
 
-    public AuctionBid(@DrawableRes final int auctionImage, @DrawableRes final int badgeImage) {
+    public EventIndicator(@DrawableRes final int auctionImage, @DrawableRes final int badgeImage) {
         this.mAuctionImage = auctionImage;
         this.mBadgeImage = badgeImage;
     }

@@ -47,9 +47,21 @@ public class CalendarUtils {
     public static boolean isToday(Calendar calendar){
 
         final Calendar todayCalendar = getCalendarForToday();
-        return todayCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
-                todayCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
-                todayCalendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH);
+        return isSameDay(todayCalendar, calendar);
+    }
+
+    /**
+     * Checks if provided date is set to today time and returns result accordingly. True
+     * if it represents today, false otherwise
+     * (Please note: hours are not taken in account, compares only YEAR, MONTH, DAY)
+     *
+     * @param date instance of {@link Date}
+     * @return true|false
+     */
+    public static boolean isToday (Date date){
+        final Calendar dateCalendar = (Calendar) CALENDAR.clone();
+        dateCalendar.setTime(date);
+        return isToday(dateCalendar);
     }
 
     private static String upperCaseWords(@NonNull String line) {
@@ -264,7 +276,6 @@ public class CalendarUtils {
      */
     public static boolean isToday(@NonNull final Day day){
 
-        // return DateUtils.isToday(day.getDate().getTime());
         final Calendar todayCalendar = (Calendar) CALENDAR.clone();
         todayCalendar.setTimeInMillis(System.currentTimeMillis());
 
@@ -277,6 +288,16 @@ public class CalendarUtils {
         return day1.get(Calendar.YEAR) == day2.get(Calendar.YEAR)
                 &&  day1.get(Calendar.MONTH) == day2.get(Calendar.MONTH)
                 && day1.get(Calendar.DAY_OF_MONTH) == day2.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public static boolean isSameDay(@NonNull final Date day1, @NonNull final Date day2){
+        final Calendar day1Calendar = (Calendar) CALENDAR.clone();
+        day1Calendar.setTime(day1);
+
+        final Calendar day2Calendar = (Calendar) CALENDAR.clone();
+        day2Calendar.setTime(day2);
+
+        return isSameDay(day1Calendar, day2Calendar);
     }
 
     /**

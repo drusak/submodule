@@ -29,8 +29,6 @@ import static com.verint.actionablecalendar.calendar.models.Direction.UP;
 
 public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreListener {
 
-    private static final String SAVED_INSTANCE_PARAM_SUPER_PARCELABLE = "SAVED_INSTANCE_PARAM_SUPER_PARCELABLE";
-
     private static final int NUMBER_DAYS_IN_A_WEEK = 7;
 
     public static final int NUMBER_OF_MONTHS_TO_LOAD = 2;
@@ -105,35 +103,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             }
         });
 
-    }
-
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        Bundle savedInstance = new Bundle();
-        // save super savedState
-        Parcelable superParcelable = super.onSaveInstanceState();
-        if (superParcelable != null) {
-            savedInstance.putParcelable(SAVED_INSTANCE_PARAM_SUPER_PARCELABLE, superParcelable);
-        }
-
-        // save custom params
-        if (mAdapter != null) {
-            mAdapter.onSaveInstanceState(savedInstance);
-        }
-
-        return savedInstance;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        Bundle savedInstance = (Bundle) state;
-        // restore super savedState
-        Parcelable superParcelable = savedInstance.getParcelable(SAVED_INSTANCE_PARAM_SUPER_PARCELABLE);
-        super.onRestoreInstanceState(superParcelable);
-        // restore custom params
-        if (mAdapter != null) {
-            mAdapter.onRestoreInstanceState(savedInstance);
-        }
     }
 
     private boolean notifyUpdateVisibleItems() {

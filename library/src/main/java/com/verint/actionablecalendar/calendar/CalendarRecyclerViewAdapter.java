@@ -1,6 +1,7 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +28,9 @@ import java.util.Locale;
 
 public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements OnMonthListScrollListener {
+
+    private static final String SAVED_INSTANCE_PARAM_CURRENT_MONTH_POSITION =
+            "SAVED_INSTANCE_PARAM_CURRENT_MONTH_POSITION";
 
     public static final int VIEW_TYPE_MONTH_HEADER = 0;
     public static final int VIEW_TYPE_MONTH_DAY = 1;
@@ -76,6 +80,14 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         } else if (holder instanceof MonthDayViewHolder) {
             ((MonthDayViewHolder) holder).bind(day, mItemClickListener);
         }
+    }
+
+    public void onSaveInstanceState(Bundle savedInstance) {
+        savedInstance.putInt(SAVED_INSTANCE_PARAM_CURRENT_MONTH_POSITION, mCurrentMonthHeaderPosition);
+    }
+
+    public void onRestoreInstanceState(Bundle savedInstance) {
+        mCurrentMonthHeaderPosition = savedInstance.getInt(SAVED_INSTANCE_PARAM_CURRENT_MONTH_POSITION, 0);
     }
 
     @Override

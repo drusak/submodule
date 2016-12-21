@@ -1,14 +1,15 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import com.verint.actionablecalendar.calendar.listener.OnListScrollDirectionalListener;
 import com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener;
@@ -27,6 +28,8 @@ import static com.verint.actionablecalendar.calendar.models.Direction.UP;
  */
 
 public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreListener {
+
+    private static final String SAVED_INSTANCE_PARAM_SUPER_PARCELABLE = "SAVED_INSTANCE_PARAM_SUPER_PARCELABLE";
 
     private static final int NUMBER_DAYS_IN_A_WEEK = 7;
 
@@ -102,6 +105,35 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
             }
         });
 
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle savedInstance = new Bundle();
+        // save super savedState
+        Parcelable superParcelable = super.onSaveInstanceState();
+        if (superParcelable != null) {
+            savedInstance.putParcelable(SAVED_INSTANCE_PARAM_SUPER_PARCELABLE, superParcelable);
+        }
+
+        // save custom params
+        if (mAdapter != null) {
+            mAdapter.onSaveInstanceState(savedInstance);
+        }
+
+        return savedInstance;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        Bundle savedInstance = (Bundle) state;
+        // restore super savedState
+        Parcelable superParcelable = savedInstance.getParcelable(SAVED_INSTANCE_PARAM_SUPER_PARCELABLE);
+        super.onRestoreInstanceState(superParcelable);
+        // restore custom params
+        if (mAdapter != null) {
+            mAdapter.onRestoreInstanceState(savedInstance);
+        }
     }
 
     private boolean notifyUpdateVisibleItems() {

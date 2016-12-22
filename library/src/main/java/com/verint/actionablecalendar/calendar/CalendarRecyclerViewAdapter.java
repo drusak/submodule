@@ -18,6 +18,7 @@ import com.verint.mylibrary.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,6 +87,32 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public int getCurrentMonthHeaderPosition() {
         return mCurrentMonthHeaderPosition;
+    }
+
+    public Date getDateByPosition(int position) {
+        if (position < getItemCount()) {
+            return mDays.get(position).getDate();
+        }
+        // to avoid null pointer
+        return new Date();
+    }
+
+    /**
+     * @param position position (day) in calendar to start search next month from
+     * @return date of first day of founded next month
+     */
+    public Date getNextMonthFromPosition(int position) {
+        if (position >= getItemCount()) {
+            return new Date();
+        }
+        Date monthDate = new Date();
+        for ( ; position < getItemCount(); position++) {
+            if (getItemViewType(position) == VIEW_TYPE_MONTH_HEADER) {
+                monthDate = mDays.get(position).getDate();
+                break;
+            }
+        }
+        return monthDate;
     }
 
     @Override

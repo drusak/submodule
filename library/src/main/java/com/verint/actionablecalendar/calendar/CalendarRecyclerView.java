@@ -199,6 +199,11 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
     }
 
+    public Date getFirstDayOfFullyVisibleMonth() {
+        final int firstVisiblePosition = mLayoutManager.findFirstVisibleItemPosition();
+        return mAdapter.getNextMonthFromPosition(firstVisiblePosition);
+    }
+
     @Override
     public void onLoadMore(final Direction scrollDirection) {
 

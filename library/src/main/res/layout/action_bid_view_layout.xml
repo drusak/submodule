@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,15 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="1dp"
-        android:layout_gravity="center"
-        tools:src="@drawable/ic_shift_bid"/>
+        android:layout_gravity="center"/>
 
     <ImageView
         android:contentDescription="@null"
         android:id="@+id/ivEventViewBadge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        tools:src="@drawable/im_approved"/>
+        android:layout_gravity="bottom|right"/>
 
 </merge>

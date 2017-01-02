@@ -26,6 +26,7 @@ public class EventIndicatorView extends FrameLayout {
     private View mRootView;
     private ImageView mEventImage;
     private ImageView mEventBadge;
+    private int mBadgeDrawableResourceId;
 
     public EventIndicatorView(Context context) {
         super(context);
@@ -97,7 +98,13 @@ public class EventIndicatorView extends FrameLayout {
     }
 
     public void setBadge(@DrawableRes int badgeId){
+        mBadgeDrawableResourceId = badgeId;
         mEventBadge.setImageDrawable(getOrCreateCachedDrawable(badgeId));
+    }
+
+    @DrawableRes
+    public int getBadgeDrawableResourceId(){
+        return mBadgeDrawableResourceId;
     }
 
     private Drawable getOrCreateCachedDrawable(@DrawableRes int drawableResId) {

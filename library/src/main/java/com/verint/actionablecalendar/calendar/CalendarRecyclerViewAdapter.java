@@ -97,6 +97,14 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         return new Date();
     }
 
+    public Day getDayByPosition(int position) {
+        if (position < getItemCount()) {
+            return mDays.get(position);
+        }
+        // to avoid null pointer
+        return new Day(new Date(), new DayState());
+    }
+
     /**
      * @param position position (day) in calendar to start search next month from
      * @return date of first day of founded next month

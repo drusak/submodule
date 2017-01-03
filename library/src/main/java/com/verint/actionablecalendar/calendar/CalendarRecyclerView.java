@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import com.verint.actionablecalendar.calendar.listener.OnListScrollDirectionalListener;
 import com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener;
 import com.verint.actionablecalendar.calendar.models.Direction;
+import com.verint.actionablecalendar.calendar.models.MonthSnapshotData;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -202,6 +203,43 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     public Date getFirstDayOfFullyVisibleMonth() {
         final int firstVisiblePosition = mLayoutManager.findFirstVisibleItemPosition();
         return mAdapter.getNextMonthFromPosition(firstVisiblePosition);
+    }
+
+    /**
+     * counts indicators and icons completely visible to user
+     * @return {@link MonthSnapshotData}
+     */
+    public MonthSnapshotData getVisibleSnapshotData() {
+        MonthSnapshotData snapshotData = new MonthSnapshotData();
+        if (mLayoutManager != null && mAdapter != null) {
+            final int firstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+            final int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
+            int numCellsWithIndicators = 0;
+            int numCellsWithOneIcon = 0;
+            int numCellsWithTwoIcons = 0;
+            for (int i = firstVisiblePosition; i <= lastVisiblePosition; i++) {
+                Day day = mAdapter.getDayByPosition(i);
+                if (day.getDayState().getType() != DayState.DayType.NON_CURRENT_MONTH_DAY) {
+                    // count only normal days
+                    if (day.isShiftEnabled()) {
+                        numCellsWithIndicators++;
+                    }
+                    boolean requestIconVisible =
+                            day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null;
+                    boolean auctionIconVisible = day.getAuctionNoBidItem() != null;
+                    if (requestIconVisible && auctionIconVisible) {
+                        numCellsWithTwoIcons++;
+                    } else if (requestIconVisible || auctionIconVisible) {
+                        numCellsWithOneIcon++;
+                    }
+                }
+            }
+            snapshotData.setIndicatorCount(numCellsWithIndicators);
+            snapshotData.setMultipleIconCellCount(numCellsWithTwoIcons);
+            snapshotData.setSingleIconCellCount(numCellsWithOneIcon);
+        }
+
+        return snapshotData;
     }
 
     @Override

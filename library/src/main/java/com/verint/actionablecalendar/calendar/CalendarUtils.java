@@ -455,6 +455,31 @@ public class CalendarUtils {
     }
 
     /**
+     * Checks
+     *
+     * @param startDate {@link Date}
+     * @param endDate {@link Date}
+     * @return {@link int} amount of month
+     */
+    public static int monthsBetween(Date startDate, Date endDate) {
+
+        Calendar cal = CalendarUtils.getCalendarForToday();
+        if (startDate.before(endDate)) {
+            cal.setTime(startDate);
+        } else {
+            cal.setTime(endDate);
+            endDate = startDate;
+        }
+
+        int count = 0;
+        while (cal.getTime().before(endDate)) {
+            cal.add(Calendar.MONTH, 1);
+            count++;
+        }
+        return count - 1;
+    }
+
+    /**
      * Counting hash code of calendar date, so using only year-month-day combination, and 00:00:00.000 time
      * @return hashcode of @param calendar date
      */

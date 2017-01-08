@@ -1,15 +1,14 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.verint.actionablecalendar.calendar.listener.OnListScrollDirectionalListener;
 import com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener;
@@ -17,6 +16,7 @@ import com.verint.actionablecalendar.calendar.models.Direction;
 import com.verint.actionablecalendar.calendar.models.MonthSnapshotData;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +49,13 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     private GridLayoutManager mLayoutManager;
     private Handler mUiHandler;
     private Handler mLoadingMoreHandler;
+
+    private int mScrolledForwardMonthCount;
+    private int mScrolledBackwardMonthCount;
+    private Date mScrolledForwardDate;
+    private Date mScrolledBackwardDate;
+
+    private Date mInitialDate;
 
     public CalendarRecyclerView(Context context) {
         super(context);
@@ -83,6 +90,11 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         mAdapter = new CalendarRecyclerViewAdapter();
         setLayoutManager(mLayoutManager);
         setAdapter(mAdapter);
+
+        // TODO: Consider delete
+        mScrolledForwardDate = new Date();
+        mScrolledBackwardDate = new Date();
+        mInitialDate = new Date();
 
         mAdapter.setOnLoadMoreListener(this);
 
@@ -143,8 +155,7 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
 
     public void initFirstLoading() {
-        Date currentMonth = new Date(System.currentTimeMillis());
-        List<MixedVisibleMonth> monthList = initMonthListForDate(currentMonth);
+        List<MixedVisibleMonth> monthList = initMonthListForDate(mInitialDate);
         setData(monthList);
         scrollToCurrentMonth();
         // fake call of smooth scroll, so it will invalidate calendar
@@ -178,7 +189,6 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         if (mOnNewMonthsAddedListener != null) {
             mOnNewMonthsAddedListener.onNewMonthsAdded(months);
         }
-
     }
 
     public void setCalendarItemClickListener(@NonNull CalendarCallbacks calendarItemClickListener) {
@@ -205,42 +215,38 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         return mAdapter.getNextMonthFromPosition(firstVisiblePosition);
     }
 
-    /**
-     * counts indicators and icons completely visible to user
-     * @return {@link MonthSnapshotData}
-     */
-    public MonthSnapshotData getVisibleSnapshotData() {
-        MonthSnapshotData snapshotData = new MonthSnapshotData();
-        if (mLayoutManager != null && mAdapter != null) {
-            final int firstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-            final int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
-            int numCellsWithIndicators = 0;
-            int numCellsWithOneIcon = 0;
-            int numCellsWithTwoIcons = 0;
-            for (int i = firstVisiblePosition; i <= lastVisiblePosition; i++) {
-                Day day = mAdapter.getDayByPosition(i);
-                if (day.getDayState().getType() != DayState.DayType.NON_CURRENT_MONTH_DAY) {
-                    // count only normal days
-                    if (day.isShiftEnabled()) {
-                        numCellsWithIndicators++;
-                    }
-                    boolean requestIconVisible =
-                            day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null;
-                    boolean auctionIconVisible = day.getAuctionNoBidItem() != null;
-                    if (requestIconVisible && auctionIconVisible) {
-                        numCellsWithTwoIcons++;
-                    } else if (requestIconVisible || auctionIconVisible) {
-                        numCellsWithOneIcon++;
-                    }
-                }
-            }
-            snapshotData.setIndicatorCount(numCellsWithIndicators);
-            snapshotData.setMultipleIconCellCount(numCellsWithTwoIcons);
-            snapshotData.setSingleIconCellCount(numCellsWithOneIcon);
+    private void updateScrolledBoundariesStatistics(@Nullable final Direction scrollDirection,
+                                                    @Nullable MixedVisibleMonth latestLoadedMonth){
+
+        // TODO: Consider remove guard check
+        if (latestLoadedMonth == null || scrollDirection == null){ // NPE guard check
+            return;
         }
 
-        return snapshotData;
-    }
+        final List<Day> dayList = latestLoadedMonth.getDayList();
+        final Date latestLoadedMonthDate;
+
+        switch (scrollDirection){
+            case DOWN: // Future
+                latestLoadedMonthDate = dayList.get(dayList.size()-1).getDate();
+                if (latestLoadedMonthDate.after(mScrolledForwardDate)){
+                    mScrolledForwardMonthCount = CalendarUtils.monthsBetween(mInitialDate, latestLoadedMonthDate);
+                    mScrolledForwardDate.setTime(latestLoadedMonthDate.getTime());
+                }
+                break;
+
+            case UP: // Past
+                latestLoadedMonthDate = dayList.get(0).getDate();
+                if (latestLoadedMonthDate.before(mScrolledBackwardDate)){
+                    mScrolledBackwardMonthCount = CalendarUtils.monthsBetween(latestLoadedMonthDate, mInitialDate);
+                    mScrolledBackwardDate.setTime(latestLoadedMonthDate.getTime());
+                }
+                break;
+
+            default:
+                throw new IllegalStateException();
+        }
+  }
 
     @Override
     public void onLoadMore(final Direction scrollDirection) {
@@ -266,6 +272,8 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
                     mAdapter.addItemAtTheEnd(nextMonth);
                     months.add(nextMonth);
+
+                    updateScrolledBoundariesStatistics(DOWN, nextMonth);
                 }
 
                 break;
@@ -283,6 +291,8 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
 
                     mAdapter.addItemAtBeginning(previousMonth);
                     months.add(previousMonth);
+
+                    updateScrolledBoundariesStatistics(UP, previousMonth);
                 }
 
                 break;
@@ -314,6 +324,70 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
         }
         return monthList;
     }
+
+    /////////////////////////////////////////////
+    /////// User Behavior Analytics Data ////////
+    /////////////////////////////////////////////
+
+    /**
+     * Returns amount of total scrolled forward (future) by user months from initial date
+     *
+     * @return {@link int} scrolled months count from initial date
+     */
+    public int getScrolledForwardMonthCount(){
+        return mScrolledForwardMonthCount;
+    }
+
+    /**
+     * Returns amount of total scrolled backward (past) by user months from inital date
+     *
+     * @return {@link int} scrolled months count from initial date
+     */
+    public int getScrolledBackwardMonthCount(){
+        return mScrolledBackwardMonthCount;
+    }
+
+    /**
+     * counts indicators and icons completely visible to user
+     *
+     * @return {@link MonthSnapshotData}
+     */
+    public MonthSnapshotData getVisibleSnapshotData() {
+        MonthSnapshotData snapshotData = new MonthSnapshotData();
+        if (mLayoutManager != null && mAdapter != null) {
+            final int firstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+            final int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
+            int numCellsWithIndicators = 0;
+            int numCellsWithOneIcon = 0;
+            int numCellsWithTwoIcons = 0;
+            for (int i = firstVisiblePosition; i <= lastVisiblePosition; i++) {
+                Day day = mAdapter.getDayByPosition(i);
+                if (DayState.DayType.NON_CURRENT_MONTH_DAY != day.getDayState().getType()) {
+                    // count only normal days
+                    if (day.isShiftEnabled()) {
+                        numCellsWithIndicators++;
+                    }
+                    boolean requestIconVisible =
+                            day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null;
+                    boolean auctionIconVisible = day.getAuctionNoBidItem() != null;
+                    if (requestIconVisible && auctionIconVisible) {
+                        numCellsWithTwoIcons++;
+                    } else if (requestIconVisible || auctionIconVisible) {
+                        numCellsWithOneIcon++;
+                    }
+                }
+            }
+            snapshotData.setIndicatorCount(numCellsWithIndicators);
+            snapshotData.setMultipleIconCellCount(numCellsWithTwoIcons);
+            snapshotData.setSingleIconCellCount(numCellsWithOneIcon);
+        }
+
+        return snapshotData;
+    }
+
+    /////////////////////////////////////////
+    /////////// Listener region /////////////
+    /////////////////////////////////////////
 
     public interface OnNewMonthsAddedListener {
         void onNewMonthsAdded(List<MixedVisibleMonth> newMonths);

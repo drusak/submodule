@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.verint.actionablecalendar.calendar.CalendarCallbacks;
@@ -15,6 +16,7 @@ import com.verint.actionablecalendar.calendar.CalendarUtils;
 import com.verint.actionablecalendar.calendar.Day;
 import com.verint.actionablecalendar.calendar.MixedVisibleMonth;
 import com.verint.actionablecalendar.calendar.models.Direction;
+import com.verint.actionablecalendar.calendar.models.CalendarSnapshotData;
 import com.verint.actionablecalendar.weekday.WeekDayBuilder;
 import com.verint.actionablecalendar.weekday.WeekDayDataFactory;
 import com.verint.actionablecalendar.weekday.WeekDayWidget;
@@ -51,11 +53,10 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        init();
         mRecyclerView = (CalendarRecyclerView) findViewById(R.id.rvMainActivityMonthList);
         mRecyclerView.setCalendarItemClickListener(this);
         mRecyclerView.initFirstLoading();
-//        mRecyclerView.setOnLoadMoreListener(MonthActivity.this);
+
         initWeekDayNames();
     }
 
@@ -73,48 +74,11 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
 
     @Override
     public void onBackPressed() {
-//        Toast.makeText(MonthActivity.this, "Changing current month shifts", Toast.LENGTH_SHORT).show();
          super.onBackPressed();
 //        performTestUpdate(new Date(System.currentTimeMillis()));
     }
 
     private void init() {
-
-//        mRecyclerView = (RecyclerView) findViewById(R.id.rvMainActivityMonthList);
-
-//        Date currentMonth = new Date(System.currentTimeMillis());
-//        initMonthListForDate(currentMonth);
-//
-//        mLayoutManager = new LinearLayoutManager(getApplicationContext(),
-//                LinearLayoutManager.VERTICAL, false);
-//        // TODO: Consider passing {@link RecyclerView} and adding listener inside of adapter
-//        mAdapter = new MonthListAdapter(mMonthList, MonthActivity.this);
-//        mRecyclerView.setLayoutManager(mLayoutManager);
-//        mRecyclerView.setHasFixedSize(true);
-//        mRecyclerView.setAdapter(mAdapter);
-//
-//        // Provide listener for load more flow
-//        mAdapter.setOnLoadMoreListener(MonthActivity.this);
-//
-//        // Specify listener for scroll events in order to differentiate scroll direction
-//        mRecyclerView.addOnScrollListener(new OnListScrollDirectionalListener(mRecyclerView) {
-//
-//            @Override
-//            public void onScrolledUp(RecyclerView recyclerView, int dx, int dy) {
-//
-//                if (mAdapter != null){
-//                    mAdapter.onMonthListScroll(mLayoutManager, Direction.UP);
-//                }
-//            }
-//
-//            @Override
-//            public void onScrolledDown(RecyclerView recyclerView, int dx, int dy) {
-//
-//                if (mAdapter != null){
-//                    mAdapter.onMonthListScroll(mLayoutManager, Direction.DOWN);
-//                }
-//            }
-//        });
 
         // Scroll to current month if such month exists within currently set data list
         final int currentMonthPosition = mAdapter.getCurrentMonthPosition();
@@ -123,7 +87,22 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
         }
     }
 
-    // {@link CalendarCallbacks} region begin
+    ////////////////////////////////////////////
+    ///// {@link CalendarCallbacks} region /////
+    ////////////////////////////////////////////
+
+    // TODO: Delete after tests
+    private void showCalendarSnapshotData(){
+
+        CalendarSnapshotData data = mRecyclerView.getLoadedSnapshotData();
+
+        String message = "Shift indicators: " + data.getIndicatorCount()
+                + ", single icon cells: " + data.getSingleIconCellCount()
+                + ", two icon cells: " + data.getTwoIconCellCount();
+
+        Log.i("MonthSnapshot", message);
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
 
     @Override
     public void onCalendarItemClick(@NonNull Day day, int position) {
@@ -143,9 +122,10 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
                 + ", position: " + position, Toast.LENGTH_SHORT).show();
     }
 
-    // {@link CalendarCallbacks} region end
+    ///////////////////////////////////////////////////
+    ////// {@link OnLoadMoreListener} region //////////
+    ///////////////////////////////////////////////////
 
-    // {@link OnLoadMoreListener} region begin
 
     @Override
     public void onLoadMore(final Direction scrollDirection) {
@@ -191,7 +171,6 @@ public class MonthActivity extends AppCompatActivity implements CalendarCallback
         for (Date each : monthDateList){
             mMonthList.add(CalendarDataFactory.newInstance().create(each));
         }
-        // mMonthList.addAll(CalendarUtils.generateInitialMonthList(date));
     }
 
     private void initWeekDayNames(){

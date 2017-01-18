@@ -265,8 +265,6 @@ public class MonthGridAdapter extends BaseAdapter {
                 }
                 mDayIconSecondLevelView.setVisibility(View.GONE);
             }
-
         }
     }
-
 }

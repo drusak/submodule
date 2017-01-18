@@ -8,15 +8,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import com.verint.actionablecalendar.calendar.listener.OnListScrollDirectionalListener;
 import com.verint.actionablecalendar.calendar.listener.OnLoadMoreListener;
 import com.verint.actionablecalendar.calendar.models.Direction;
-import com.verint.actionablecalendar.calendar.models.MonthSnapshotData;
+import com.verint.actionablecalendar.calendar.models.CalendarSnapshotData;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -350,40 +348,107 @@ public class CalendarRecyclerView extends RecyclerView implements OnLoadMoreList
     /**
      * counts indicators and icons completely visible to user
      *
-     * @return {@link MonthSnapshotData}
+     * @return {@link CalendarSnapshotData}
      */
-    public MonthSnapshotData getVisibleSnapshotData() {
-        MonthSnapshotData snapshotData = new MonthSnapshotData();
+    public CalendarSnapshotData getVisibleSnapshotData() {
+
+        final CalendarSnapshotData snapshotData = new CalendarSnapshotData();
+
         if (mLayoutManager != null && mAdapter != null) {
+
             final int firstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
             final int lastVisiblePosition = mLayoutManager.findLastCompletelyVisibleItemPosition();
-            int numCellsWithIndicators = 0;
-            int numCellsWithOneIcon = 0;
-            int numCellsWithTwoIcons = 0;
-            for (int i = firstVisiblePosition; i <= lastVisiblePosition; i++) {
-                Day day = mAdapter.getDayByPosition(i);
-                if (DayState.DayType.NON_CURRENT_MONTH_DAY != day.getDayState().getType()) {
-                    // count only normal days
-                    if (day.isShiftEnabled()) {
-                        numCellsWithIndicators++;
-                    }
-                    boolean requestIconVisible =
-                            day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null;
-                    boolean auctionIconVisible = day.getAuctionNoBidItem() != null;
-                    if (requestIconVisible && auctionIconVisible) {
-                        numCellsWithTwoIcons++;
-                    } else if (requestIconVisible || auctionIconVisible) {
-                        numCellsWithOneIcon++;
-                    }
-                }
-            }
-            snapshotData.setIndicatorCount(numCellsWithIndicators);
-            snapshotData.setMultipleIconCellCount(numCellsWithTwoIcons);
-            snapshotData.setSingleIconCellCount(numCellsWithOneIcon);
+
+            fillSnapshotDataByRange(snapshotData, firstVisiblePosition, lastVisiblePosition);
         }
 
         return snapshotData;
     }
+
+    /**
+     * Counts indicators and icons that potentially were visible to user during interaction
+     * with application
+     *
+     * @return {@link CalendarSnapshotData}
+     */
+    public CalendarSnapshotData getLoadedSnapshotData() {
+
+        final CalendarSnapshotData snapshotData = new CalendarSnapshotData();
+
+        if (mLayoutManager != null && mAdapter != null) {
+
+            final int firstItemIndex = 0;
+            final int lastItemIndex = mAdapter.getItemCount() - 1;
+
+            fillSnapshotDataByRange(snapshotData, firstItemIndex, lastItemIndex);
+        }
+
+        return snapshotData;
+    }
+
+    /**
+     * Fills {@link CalendarSnapshotData} with snapshot data which is represented within
+     * {@link CalendarRecyclerView} (list of all months calendars)
+     *
+     * @param snapshotData {@link CalendarSnapshotData}
+     * @param beginDayPosition index of first {@link Day} item within {@code mAdapter}
+     * @param endDayPosition index of last {@link Day} item within {@code mAdapter}
+     */
+    private void fillSnapshotDataByRange(@NonNull CalendarSnapshotData snapshotData,
+                                                         final int beginDayPosition,
+                                                         final int endDayPosition){
+
+        if (mLayoutManager != null && mAdapter != null
+                && beginDayPosition < endDayPosition
+                && endDayPosition < mAdapter.getItemCount()) {
+
+            int numCellsWithIndicators = 0;
+            int numCellsWithOneIcon = 0;
+            int numCellsWithTwoIcons = 0;
+            int numCellsWithPotentiallyExtraIcon = 0;
+
+            for (int i = beginDayPosition; i <= endDayPosition; i++) {
+
+                Day day = mAdapter.getDayByPosition(i);
+
+                if (DayState.DayType.NON_CURRENT_MONTH_DAY != day.getDayState().getType()
+                        && DayState.DayType.MONTH_HEADER != day.getDayState().getType()) {
+
+                    // count only normal days
+                    if (day.isShiftEnabled()) {
+                        numCellsWithIndicators++;
+                    }
+
+                    boolean auctionWithoutBidsPresent = day.getAuctionNoBidItem() != null;
+                    boolean auctionWithBidsPresent = day.getAuctionWithBidItem() != null;
+                    boolean timeOffRequestPresent = day.getTimeOffItem() != null;
+
+                    boolean requestIconVisible = timeOffRequestPresent || auctionWithBidsPresent;
+                    boolean auctionIconVisible = auctionWithoutBidsPresent;
+
+
+                    if (requestIconVisible && auctionIconVisible) {
+
+                        numCellsWithTwoIcons++;
+
+                    } else if (requestIconVisible || auctionIconVisible) {
+                        numCellsWithOneIcon++;
+                    }
+
+                    // Check if theoretically we have to show third icon
+                    if (auctionWithBidsPresent && auctionWithoutBidsPresent && timeOffRequestPresent){
+                        numCellsWithPotentiallyExtraIcon++;
+                    }
+                }
+            }
+
+            snapshotData.setIndicatorCount(numCellsWithIndicators);
+            snapshotData.setTwoIconCellCount(numCellsWithTwoIcons);
+            snapshotData.setSingleIconCellCount(numCellsWithOneIcon);
+            snapshotData.setPotentiallyExtraIconCellCount(numCellsWithPotentiallyExtraIcon);
+        }
+    }
+
 
     /////////////////////////////////////////
     /////////// Listener region /////////////

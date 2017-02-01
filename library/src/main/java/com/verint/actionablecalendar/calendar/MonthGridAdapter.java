@@ -241,16 +241,16 @@ public class MonthGridAdapter extends BaseAdapter {
             if (day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null) {
                 mDayIconFirstLevelView.setVisibility(View.VISIBLE);
                 if (day.getTimeOffItem() != null) {
-                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getAuctionImage());
+                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getIconImage());
                     mDayIconFirstLevelView.setBadge(day.getTimeOffItem().getBadgeImage());
                 } else {
-                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getAuctionImage());
+                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getIconImage());
                     mDayIconFirstLevelView.setBadge(day.getAuctionWithBidItem().getBadgeImage());
                 }
 
                 if (day.getAuctionNoBidItem() != null) {
                     mDayIconSecondLevelView.setVisibility(View.VISIBLE);
-                    mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
+                    mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
                     mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                 } else {
                     mDayIconSecondLevelView.setVisibility(View.GONE);
@@ -258,7 +258,7 @@ public class MonthGridAdapter extends BaseAdapter {
             } else {
                 if (day.getAuctionNoBidItem() != null) {
                     mDayIconFirstLevelView.setVisibility(View.VISIBLE);
-                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
+                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
                     mDayIconFirstLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                 } else {
                     mDayIconFirstLevelView.setVisibility(View.GONE);

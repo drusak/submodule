@@ -1,7 +1,6 @@
 package com.verint.actionablecalendar.calendar;
 
 import android.graphics.Color;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -461,16 +460,16 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             if (day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null) {
                 mDayIconFirstLevelView.setVisibility(View.VISIBLE);
                 if (day.getTimeOffItem() != null) {
-                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getAuctionImage());
+                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getIconImage());
                     mDayIconFirstLevelView.setBadge(day.getTimeOffItem().getBadgeImage());
                 } else {
-                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getAuctionImage());
+                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getIconImage());
                     mDayIconFirstLevelView.setBadge(day.getAuctionWithBidItem().getBadgeImage());
                 }
 
                 if (day.getAuctionNoBidItem() != null) {
                     mDayIconSecondLevelView.setVisibility(View.VISIBLE);
-                    mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
+                    mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
                     mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                 } else {
                     mDayIconSecondLevelView.setVisibility(View.GONE);
@@ -478,7 +477,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             } else {
                 if (day.getAuctionNoBidItem() != null) {
                     mDayIconFirstLevelView.setVisibility(View.VISIBLE);
-                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getAuctionImage());
+                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
                     mDayIconFirstLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                 } else {
                     mDayIconFirstLevelView.setVisibility(View.GONE);

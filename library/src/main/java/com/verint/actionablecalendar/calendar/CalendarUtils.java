@@ -389,6 +389,9 @@ public class CalendarUtils {
 
         final Calendar  calendar = (Calendar) originCalendar.clone();
 
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.AM_PM, Calendar.AM);
+
         calendar.set(Calendar.HOUR_OF_DAY,0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -407,6 +410,9 @@ public class CalendarUtils {
     public static Calendar getCalendarEndOfDay(Calendar originCalendar){
 
         final Calendar  calendar = (Calendar) originCalendar.clone();
+
+        calendar.set(Calendar.HOUR, 11);
+        calendar.set(Calendar.AM_PM, Calendar.PM);
 
         calendar.set(Calendar.HOUR_OF_DAY,23);
         calendar.set(Calendar.MINUTE, 59);
@@ -427,6 +433,9 @@ public class CalendarUtils {
         final Calendar  calendar = (Calendar) CALENDAR.clone();
         calendar.setTime(date);
 
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.AM_PM, Calendar.AM);
+
         calendar.set(Calendar.HOUR_OF_DAY,0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -445,6 +454,9 @@ public class CalendarUtils {
 
         final Calendar  calendar = (Calendar) CALENDAR.clone();
         calendar.setTime(date);
+
+        calendar.set(Calendar.HOUR, 11);
+        calendar.set(Calendar.AM_PM, Calendar.PM);
 
         calendar.set(Calendar.HOUR_OF_DAY,23);
         calendar.set(Calendar.MINUTE, 59);

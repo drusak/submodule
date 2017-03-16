@@ -29,6 +29,16 @@ public class Day {
     private EventIndicator mAuctionWithBidItem;
     // view for auction without bids icon and badge
     private EventIndicator mAuctionNoBidItem;
+    // view for swap request
+    private EventIndicator mSwapRequest;
+    // view for my swap post
+    private EventIndicator mMySwapPost;
+    // view for rest users swap post
+    private EventIndicator mRestUsersSwapPost;
+    // view for my + rest users swap posts
+    private EventIndicator mGeneralSwapPost;
+    // view for more (three dots)
+    private EventIndicator mMore;
 
     public Day(final Date date, @NonNull DayState dayState){
 
@@ -110,5 +120,45 @@ public class Day {
 
     public void setAuctionNoBidItem(EventIndicator auctionNoBidItem) {
         mAuctionNoBidItem = auctionNoBidItem;
+    }
+
+    public EventIndicator getMySwapPost() {
+        return mMySwapPost;
+    }
+
+    public void setMySwapPost(EventIndicator mySwapPost) {
+        mMySwapPost = mySwapPost;
+    }
+
+    public EventIndicator getSwapRequest() {
+        return mSwapRequest;
+    }
+
+    public void setSwapRequest(EventIndicator swapRequest) {
+        mSwapRequest = swapRequest;
+    }
+
+    public EventIndicator getMore() {
+        return mMore;
+    }
+
+    public void setMore(EventIndicator more) {
+        mMore = more;
+    }
+
+    public EventIndicator getRestUsersSwapPost() {
+        return mRestUsersSwapPost;
+    }
+
+    public void setRestUsersSwapPost(EventIndicator restUsersSwapPost) {
+        mRestUsersSwapPost = restUsersSwapPost;
+    }
+
+    public EventIndicator getGeneralSwapPost() {
+        return mGeneralSwapPost;
+    }
+
+    public void setGeneralSwapPost(EventIndicator generalSwapPost) {
+        mGeneralSwapPost = generalSwapPost;
     }
 }

@@ -509,4 +509,25 @@ public class CalendarUtils {
         // TODO: consider making here dedicated implementation in order to reduce usage of stack memory
         return getHashKey(CalendarUtils.getCalendarFrom(date));
     }
+
+    /**
+     * Check if endDateCalendar is 00:00 and change it to 23:59 explicitly
+     * in order not to count next day with duration 0
+     *
+     * @param endDateCalendar to check date with
+     */
+    public static Calendar getMidnightSafeEndDate(final Calendar endDateCalendar) {
+
+        Calendar calendar = (Calendar) endDateCalendar.clone();
+
+        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        if (hourOfDay == 0 && minute == 0) {
+            // explicitly minus 1 minute to avoid adding next day with 00:00 time
+            calendar.add(Calendar.MINUTE, -1);
+        }
+
+        return calendar;
+    }
 }

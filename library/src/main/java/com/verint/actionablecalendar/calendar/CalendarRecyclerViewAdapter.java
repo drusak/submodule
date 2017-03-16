@@ -288,6 +288,9 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         day.setTimeOffItem(newDay.getTimeOffItem());
                         day.setAuctionNoBidItem(newDay.getAuctionNoBidItem());
                         day.setAuctionWithBidItem(newDay.getAuctionWithBidItem());
+
+                        day.setMySwapPost(newDay.getMySwapPost());
+                        day.setSwapRequest(newDay.getSwapRequest());
                     }
                 }
                 return true;
@@ -348,6 +351,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         public void bind(@NonNull final Day day, final CalendarCallbacks listener){
+
             switch (day.getDayState().getType()){
 
                 case CURRENT_MONTH_DAY_NORMAL: // Current month day
@@ -453,39 +457,209 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         /**
+         * Returns amount of icons that can be represented on day
+         *
+         * @param day {@link Day}
+         * @return The mount of icons that can be shown on {@link Day} cell
+         */
+        private int getIconTotalForDay(@NonNull final Day day){
+
+            int iconCount = 0;
+
+            if (day.getTimeOffItem() != null){
+                iconCount++;
+            }
+
+            if (day.getSwapRequest() != null){
+                iconCount++;
+            }
+
+            // We count my swap posts and posts of rests users as single icon
+            if (day.getMySwapPost() != null
+                    || day.getRestUsersSwapPost() != null
+                    || day.getGeneralSwapPost() != null){
+                iconCount++;
+            }
+
+            // We count auctions with and without bids as single icon
+            if (day.getAuctionWithBidItem() != null || day.getAuctionNoBidItem() != null){
+                iconCount++;
+            }
+
+            return iconCount;
+        }
+
+        /**
+         * Assigns icon and badge on first from two possible icons
+         *
+         * @param day The day to assigns icons on it
+         * @param iconTotalCount Total amount of potential icons that can be assigned
+         */
+        private void setVisibilityForFirstIcon(@NonNull final Day day, final int iconTotalCount){
+
+            int firstIconPriorityLevel = -1;
+
+            if (iconTotalCount > 0){
+
+                if (day.getTimeOffItem() != null){
+
+                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getIconImage());
+                    mDayIconFirstLevelView.setBadge(day.getTimeOffItem().getBadgeImage());
+                    firstIconPriorityLevel = 0;
+
+                } else if (day.getSwapRequest() != null){
+
+                    mDayIconFirstLevelView.setImage(day.getSwapRequest().getIconImage());
+                    mDayIconFirstLevelView.setBadge(day.getSwapRequest().getBadgeImage());
+                    firstIconPriorityLevel = 1;
+
+                } else if (day.getMySwapPost() != null){
+
+                    if (day.getRestUsersSwapPost() != null){
+
+                        mDayIconFirstLevelView.setImage(day.getGeneralSwapPost().getIconImage());
+                        mDayIconFirstLevelView.setBadge(day.getGeneralSwapPost().getBadgeImage());
+
+                    } else {
+
+                        mDayIconFirstLevelView.setImage(day.getMySwapPost().getIconImage());
+                        mDayIconFirstLevelView.setBadge(day.getMySwapPost().getBadgeImage());
+                    }
+                    firstIconPriorityLevel = 2;
+
+                } else if (day.getAuctionWithBidItem() != null){
+
+                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getIconImage());
+                    mDayIconFirstLevelView.setBadge(day.getAuctionWithBidItem().getBadgeImage());
+                    firstIconPriorityLevel = 3;
+
+                } else if (day.getAuctionNoBidItem() != null){
+
+                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
+                    mDayIconFirstLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
+                    firstIconPriorityLevel = 4;
+
+                } else if (day.getRestUsersSwapPost() != null){
+
+                    if (day.getMySwapPost() == null){
+
+                        mDayIconFirstLevelView.setImage(day.getRestUsersSwapPost().getIconImage());
+                        mDayIconFirstLevelView.setBadge(day.getRestUsersSwapPost().getBadgeImage());
+                        firstIconPriorityLevel = 5;
+                    }
+                }
+            }
+
+            // Set visibility for first icon according to matching state
+            mDayIconFirstLevelView.setVisibility(iconTotalCount > 0 ? View.VISIBLE : View.INVISIBLE);
+
+            // Set visibility for second icon
+            setVisibilityForSecondIcon(day, iconTotalCount, firstIconPriorityLevel);
+        }
+
+        /**
+         * Assigns icon and badge on second from two possible icons
+         *
+         * @param day The day to assigns icons on it
+         * @param iconTotalCount Total amount of potential icons that can be assigned
+         * @param firstIconPriorityLevel The priority of first assigned icon
+         */
+        private void setVisibilityForSecondIcon(@NonNull final Day day,
+                                                final int iconTotalCount,
+                                                final int firstIconPriorityLevel){
+
+            boolean iconMatched = false;
+
+            if (iconTotalCount > 0){ // Check only if we have potentially icons to assigns
+
+                if (iconTotalCount < 3){ // If we have less than potential 3 icons
+
+                    // Priority should inform us which type of icon was set on the first level
+                    // icon, next one should be one priority level higher, hence we can exclude from
+                    // matching search several cases, as result result will be matched faster
+                    switch (firstIconPriorityLevel){
+
+                        case -1:
+                            break;
+
+                        case 0:
+
+                            if (day.getSwapRequest() != null) {
+                                mDayIconSecondLevelView.setImage(day.getSwapRequest().getIconImage());
+                                mDayIconSecondLevelView.setBadge(day.getSwapRequest().getBadgeImage());
+                                iconMatched = true;
+                                break;
+                            }
+
+                        case 1:
+
+                            if (day.getMySwapPost() != null) {
+                                if (day.getRestUsersSwapPost() != null){
+                                    mDayIconSecondLevelView.setImage(day.getGeneralSwapPost().getIconImage());
+                                    mDayIconSecondLevelView.setBadge(day.getGeneralSwapPost().getBadgeImage());
+
+                                } else {
+
+                                    mDayIconSecondLevelView.setImage(day.getMySwapPost().getIconImage());
+                                    mDayIconSecondLevelView.setBadge(day.getMySwapPost().getBadgeImage());
+                                }
+                                iconMatched = true;
+                                break;
+                            }
+
+                        case 2:
+
+                            if (day.getAuctionWithBidItem() != null) {
+                                mDayIconSecondLevelView.setImage(day.getMySwapPost().getIconImage());
+                                mDayIconSecondLevelView.setBadge(day.getMySwapPost().getBadgeImage());
+                                iconMatched = true;
+                                break;
+                            }
+
+                        case 3:
+
+                            if (day.getAuctionNoBidItem() != null) {
+                                mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
+                                mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
+                                iconMatched = true;
+                                break;
+                            }
+
+                        case 4:
+
+                            if (day.getRestUsersSwapPost() != null) {
+
+                                if (day.getMySwapPost() == null){
+                                    mDayIconSecondLevelView.setImage(day.getRestUsersSwapPost().getIconImage());
+                                    mDayIconSecondLevelView.setBadge(day.getRestUsersSwapPost().getBadgeImage());
+                                    iconMatched = true;
+                                    break;
+                                }
+                            }
+
+                        case 5:
+                        default:
+                            // Do nothing
+                            break;
+                    }
+
+                } else {  // If we have 3 icons or more
+
+                    mDayIconSecondLevelView.setImage(day.getMore().getIconImage());
+                    mDayIconSecondLevelView.setBadge(day.getMore().getBadgeImage());
+                    iconMatched = true;
+                }
+            }
+
+            // Change icon visibility accordingly to matching value
+            mDayIconSecondLevelView.setVisibility(iconMatched ? View.VISIBLE : View.INVISIBLE);
+        }
+
+        /**
          * hide, show icons and badges for levels depending on day
          */
         private void setVisibilityForLevelIcon(Day day) {
-
-            if (day.getTimeOffItem() != null || day.getAuctionWithBidItem() != null) {
-                mDayIconFirstLevelView.setVisibility(View.VISIBLE);
-                if (day.getTimeOffItem() != null) {
-                    mDayIconFirstLevelView.setImage(day.getTimeOffItem().getIconImage());
-                    mDayIconFirstLevelView.setBadge(day.getTimeOffItem().getBadgeImage());
-                } else {
-                    mDayIconFirstLevelView.setImage(day.getAuctionWithBidItem().getIconImage());
-                    mDayIconFirstLevelView.setBadge(day.getAuctionWithBidItem().getBadgeImage());
-                }
-
-                if (day.getAuctionNoBidItem() != null) {
-                    mDayIconSecondLevelView.setVisibility(View.VISIBLE);
-                    mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
-                    mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
-                } else {
-                    mDayIconSecondLevelView.setVisibility(View.GONE);
-                }
-            } else {
-                if (day.getAuctionNoBidItem() != null) {
-                    mDayIconFirstLevelView.setVisibility(View.VISIBLE);
-                    mDayIconFirstLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
-                    mDayIconFirstLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
-                } else {
-                    mDayIconFirstLevelView.setVisibility(View.GONE);
-                }
-                mDayIconSecondLevelView.setVisibility(View.GONE);
-            }
-
+            setVisibilityForFirstIcon(day, getIconTotalForDay(day));
         }
     }
-
 }

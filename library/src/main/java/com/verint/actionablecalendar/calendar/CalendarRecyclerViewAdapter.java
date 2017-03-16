@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Created by Dmitry Rusak on 11/15/16.
@@ -457,39 +459,6 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
         /**
-         * Returns amount of icons that can be represented on day
-         *
-         * @param day {@link Day}
-         * @return The mount of icons that can be shown on {@link Day} cell
-         */
-        private int getIconTotalForDay(@NonNull final Day day){
-
-            int iconCount = 0;
-
-            if (day.getTimeOffItem() != null){
-                iconCount++;
-            }
-
-            if (day.getSwapRequest() != null){
-                iconCount++;
-            }
-
-            // We count my swap posts and posts of rests users as single icon
-            if (day.getMySwapPost() != null
-                    || day.getRestUsersSwapPost() != null
-                    || day.getGeneralSwapPost() != null){
-                iconCount++;
-            }
-
-            // We count auctions with and without bids as single icon
-            if (day.getAuctionWithBidItem() != null || day.getAuctionNoBidItem() != null){
-                iconCount++;
-            }
-
-            return iconCount;
-        }
-
-        /**
          * Assigns icon and badge on first from two possible icons
          *
          * @param day The day to assigns icons on it
@@ -570,7 +539,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
             boolean iconMatched = false;
 
-            if (iconTotalCount > 0){ // Check only if we have potentially icons to assigns
+            if (iconTotalCount > 1){ // Check only if we have two icons and more (first was assigned in previous method)
 
                 if (iconTotalCount < 3){ // If we have less than potential 3 icons
 
@@ -593,13 +562,13 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                         case 1:
 
-                            if (day.getMySwapPost() != null) {
+
+                            if (day.getMySwapPost() != null){
+
                                 if (day.getRestUsersSwapPost() != null){
                                     mDayIconSecondLevelView.setImage(day.getGeneralSwapPost().getIconImage());
                                     mDayIconSecondLevelView.setBadge(day.getGeneralSwapPost().getBadgeImage());
-
                                 } else {
-
                                     mDayIconSecondLevelView.setImage(day.getMySwapPost().getIconImage());
                                     mDayIconSecondLevelView.setBadge(day.getMySwapPost().getBadgeImage());
                                 }
@@ -629,12 +598,19 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                             if (day.getRestUsersSwapPost() != null) {
 
-                                if (day.getMySwapPost() == null){
+                                if (day.getMySwapPost() != null){
+
+                                    mDayIconFirstLevelView.setImage(day.getGeneralSwapPost().getIconImage());
+                                    mDayIconFirstLevelView.setBadge(day.getGeneralSwapPost().getBadgeImage());
+
+                                } else {
+
                                     mDayIconSecondLevelView.setImage(day.getRestUsersSwapPost().getIconImage());
                                     mDayIconSecondLevelView.setBadge(day.getRestUsersSwapPost().getBadgeImage());
-                                    iconMatched = true;
-                                    break;
                                 }
+
+                                iconMatched = true;
+                                break;
                             }
 
                         case 5:
@@ -659,7 +635,8 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
          * hide, show icons and badges for levels depending on day
          */
         private void setVisibilityForLevelIcon(Day day) {
-            setVisibilityForFirstIcon(day, getIconTotalForDay(day));
+
+            setVisibilityForFirstIcon(day, CalendarUtils.getIconTotalForDay(day));
         }
     }
 }

@@ -530,4 +530,41 @@ public class CalendarUtils {
 
         return calendar;
     }
+
+    /**
+     * Counts amount of icons that (theoretically) should be shown on single day cell.
+     * Please note: value can be greater than 2 since it returns total amount of icons to show,
+     * however later we make limitation to only two icons
+     *
+     * Please note #2: It not includes the 'More' icon
+     *
+     * @param day {@link Day}
+     * @return The amount of icons for single {@link Day} cell, e.g. 4
+     */
+    public static int getIconTotalForDay(@NonNull final Day day){
+
+        int iconCount = 0;
+
+        if (day.getTimeOffItem() != null){
+            iconCount++;
+        }
+
+        if (day.getSwapRequest() != null){
+            iconCount++;
+        }
+
+        // We count my swap posts and posts of rests users as single icon
+        if (day.getMySwapPost() != null
+                || day.getRestUsersSwapPost() != null
+                || day.getGeneralSwapPost() != null){
+            iconCount++;
+        }
+
+        // We count auctions with and without bids as single icon
+        if (day.getAuctionWithBidItem() != null || day.getAuctionNoBidItem() != null){
+            iconCount++;
+        }
+
+        return iconCount;
+    }
 }

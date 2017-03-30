@@ -587,7 +587,7 @@ public class CalendarRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                         case 3:
 
-                            if (day.getAuctionNoBidItem() != null) {
+                            if (day.getAuctionNoBidItem() != null && day.getAuctionWithBidItem() == null) {
                                 mDayIconSecondLevelView.setImage(day.getAuctionNoBidItem().getIconImage());
                                 mDayIconSecondLevelView.setBadge(day.getAuctionNoBidItem().getBadgeImage());
                                 iconMatched = true;

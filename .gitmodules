@@ -1,0 +1,4 @@
+[submodule "sub"]
+	path = sub
+	url = git@github.com:drusak/submodule.git
+	ignore = all
